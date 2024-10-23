@@ -1,0 +1,155 @@
+﻿using MTecl.GraphQlClient.ObjectMapping.Descriptors;
+using MTecl.GraphQlClient.ObjectMapping.GraphModel;
+using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
+using MTecl.GraphQlClient.ObjectMapping.Visitors;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace MTecl.GraphQlClient.ObjectMapping
+{
+    internal static class QueryMapper
+    {
+        private static readonly HashSet<Type> _primitiveTypes = new HashSet<Type>
+        {
+            typeof(string),
+            typeof(int),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
+            typeof(bool),
+            typeof(char),
+            typeof(byte),
+            typeof(sbyte),
+            typeof(short),
+            typeof(ushort),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(DateTime)    
+        };
+
+        private static readonly DefaultMethodVisitor _defaultVisitor = new DefaultMethodVisitor();
+        private static readonly ConcurrentDictionary<MethodInfo, IMethodVisitor> _visitorCache = new ConcurrentDictionary<MethodInfo, IMethodVisitor>();
+       
+        public static QueryNode<TQuery> MapQuery<TQuery>(Expression<Func<TQuery, object>> expression)
+        {
+            var node = new QueryNode<TQuery>();
+
+            if(!(expression.Body is MethodCallExpression methodCallExpression)) 
+                throw new ArgumentException("Method call expected");
+
+            VisitMethod(node, methodCallExpression);
+
+            return node;
+        }
+
+        private static INode VisitMethod(INode parent, MethodCallExpression mce)
+        {
+            var visitor = ResolveVisitor(mce.Method);
+
+            return visitor.Visit(parent, mce);
+        }
+
+        private static IMethodVisitor ResolveVisitor(MethodInfo m)
+        {
+            return _visitorCache.GetOrAdd(m, (method) => {
+                var viattr = method.GetCustomAttribute<TreeVisitorAttribute>(true);
+                if (viattr == null)
+                    return _defaultVisitor;
+
+                return (IMethodVisitor)Activator.CreateInstance(viattr.VisitorType);
+            });
+        }
+
+        internal static INode Visit(INode parent, Expression e)
+        {
+            while (e is LambdaExpression lex)
+                e = lex.Body;
+
+            if (e is UnaryExpression unr && unr.NodeType == ExpressionType.Convert)
+                return Visit(parent, unr.Operand);
+
+            if (e is MethodCallExpression mce)
+                return VisitMethod(parent, mce);
+
+            if (e is MemberExpression pe)
+                return VisitMember(parent, pe);
+                        
+            throw new NotSupportedException($"Unexpected type of expression {e.GetType().Name}: {e}");
+        }
+
+        private static INode VisitMember(INode parent, MemberExpression pe)
+        {
+            if (pe.Expression is MemberExpression parentMex)
+            {
+                parent = VisitMember(parent, parentMex);
+            }
+
+            if (pe.Expression is MethodCallExpression mce)
+            {
+                parent = VisitMethod(parent, mce);
+            }
+
+            Type t;
+            if (pe.Member is PropertyInfo pi)
+                t = pi.PropertyType;
+            else if (pe.Member is FieldInfo fi)
+                t = fi.FieldType;
+            else
+                throw new NotSupportedException($"Unexpected member type {pe.Member.MemberType}");
+
+            var memberNode = ConstructMemberNode(pe.Member, t);
+            parent.Nodes.Add(memberNode);
+
+            return memberNode;
+        }
+
+        internal static FieldNode ConstructMemberNode(MemberInfo member, Type memberType, bool topNodeOnly = false)
+        {
+            var memberInfo = GqlMemberHelper.MapMember<GqlAttribute>(member);
+
+            var memberNode = new FieldNode
+            {
+                Name = memberInfo.Name
+            };
+
+            if (topNodeOnly || !IsComplexType(memberType))
+                return memberNode;
+
+            var fields = GqlMemberHelper.MapMembers<PropertyInfo, GqlAttribute>(memberType);
+
+            foreach (var field in fields)
+            {
+                if (field.Value.InclusionMode == FieldInclusionMode.Exclude)
+                    continue;
+
+                var complex = IsComplexType(field.Key.PropertyType);
+
+                if (complex && field.Value.InclusionMode == FieldInclusionMode.Default)
+                    continue;
+
+                if (!complex)
+                {
+                    memberNode.Nodes.Add(new FieldNode
+                    {
+                        Name = field.Value.Name
+                    });
+                }
+                else
+                {
+                    memberNode.Nodes.Add(ConstructMemberNode(field.Key, field.Key.PropertyType));
+                }
+            }
+
+            return memberNode;
+        }
+
+        private static bool IsComplexType(Type t)
+        {
+            return !_primitiveTypes.Contains(t);
+        }
+    }
+}
