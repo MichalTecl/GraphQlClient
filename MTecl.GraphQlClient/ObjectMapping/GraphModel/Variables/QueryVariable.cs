@@ -37,6 +37,18 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables
                 && typeof(QueryVariable).IsAssignableFrom(pi.DeclaringType)); 
         }
 
+        public static T Pass<T>(string name) { return default; }
+
+        internal static bool IsPassMethod(MethodInfo method)
+        {
+            return method.Name == nameof(Pass) && method.DeclaringType == typeof(QueryVariable);
+        }
+
+        internal static IRenderMyself GetVariableNameRenderer(string value)
+        {
+            return new VariableName(value);
+        }
+
         private sealed class VariableName : IRenderMyself
         {
             private readonly string _name;
@@ -50,6 +62,8 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables
             {
                 sb.Append(_name);
             }
-        }
+
+            public override string ToString() => _name;           
+        }        
     }
 }

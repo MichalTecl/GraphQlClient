@@ -2,9 +2,11 @@
 using MTecl.GraphQlClient.ObjectMapping.GraphModel;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
 using MTecl.GraphQlClient.ObjectMapping.Visitors;
+using MTecl.GraphQlClient.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -30,6 +32,8 @@ namespace MTecl.GraphQlClient.ObjectMapping
             typeof(ulong),
             typeof(DateTime)    
         };
+
+        private static readonly string[] _nulItemArray = new string[] { null };
 
         private static readonly DefaultMethodVisitor _defaultVisitor = new DefaultMethodVisitor();
         private static readonly ConcurrentDictionary<MethodInfo, IMethodVisitor> _visitorCache = new ConcurrentDictionary<MethodInfo, IMethodVisitor>();
@@ -109,38 +113,54 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
         internal static FieldNode ConstructMemberNode(MemberInfo member, Type memberType, bool topNodeOnly = false)
         {
-            var memberInfo = GqlMemberHelper.MapMember<GqlAttribute>(member);
+            var memberInfo = GqlMemberHelper.MapMember(member);
 
             var memberNode = new FieldNode
             {
-                Name = memberInfo.Name
+                Name = memberInfo.Attribute.Name
             };
 
             if (topNodeOnly || !IsComplexType(memberType))
                 return memberNode;
 
-            var fields = GqlMemberHelper.MapMembers<PropertyInfo, GqlAttribute>(memberType);
+            var fields = GqlMemberHelper.MapMembers<PropertyInfo>(memberType);
+
+            var fragmentNodes = new Dictionary<string, INode>();
 
             foreach (var field in fields)
             {
-                if (field.Value.InclusionMode == FieldInclusionMode.Exclude)
+                if (field.Attribute.InclusionMode == FieldInclusionMode.Exclude)
                     continue;
 
-                var complex = IsComplexType(field.Key.PropertyType);
+                var complex = IsComplexType(((PropertyInfo)field.Member).PropertyType);
 
-                if (complex && field.Value.InclusionMode == FieldInclusionMode.Default)
+                if (complex && field.Attribute.InclusionMode == FieldInclusionMode.Default)
                     continue;
-
-                if (!complex)
+                                
+                INode targetNode = memberNode;
+                foreach (var type in field.GqlTypes.Length == 0 ? _nulItemArray : field.GqlTypes)
                 {
-                    memberNode.Nodes.Add(new FieldNode
+                    if (type != null)
                     {
-                        Name = field.Value.Name
-                    });
-                }
-                else
-                {
-                    memberNode.Nodes.Add(ConstructMemberNode(field.Key, field.Key.PropertyType));
+                        if (!fragmentNodes.TryGetValue(type, out targetNode))
+                        {
+                            targetNode = new InlineFragmentNode { OnType = type };
+                            fragmentNodes.Add(type, targetNode);
+                            memberNode.Nodes.Add(targetNode);
+                        }
+                    }
+
+                    if (!complex)
+                    {
+                        targetNode.Nodes.Add(new FieldNode
+                        {
+                            Name = field.Attribute.Name
+                        });
+                    }
+                    else
+                    {
+                        targetNode.Nodes.Add(ConstructMemberNode(field.Member, ((PropertyInfo)field.Member).PropertyType));
+                    }
                 }
             }
 

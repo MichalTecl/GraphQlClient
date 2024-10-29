@@ -12,70 +12,85 @@ namespace MTecl.GraphQlClient.UnitTests
     public class GqlMemberHelperTests
     {
         [Fact]
-        public void MarkedPropertiesAreMapped()
+        public void AllPropertiesAreMapped()
         {
-            var members = GqlMemberHelper.MapMembers<PropertyInfo, TestAttr>(typeof(C1));
-            members.Should().Contain(m => m.Key.Name == nameof(C1.Property1) && m.Value.Name == TestAttr.DEFAULT_NAME);
+            var members = GqlMemberHelper.MapMembers<PropertyInfo>(typeof(C1));
+            members.Should().Contain(m => m.Member.Name == nameof(C1.Property1) && m.Attribute.Name == "testName");
+            members.Should().Contain(m => m.Member.Name == nameof(C1.NotMarkedProperty) 
+                                       && m.Attribute.Name == nameof(C1.NotMarkedProperty)
+                                       && m.Attribute.InclusionMode == FieldInclusionMode.Default);
         }
 
-        [Fact]
-        public void NotMarkedPropertiesAreSkipped()
+        [Theory]
+        [InlineData(typeof(List<C1>), typeof(C1))]
+        [InlineData(typeof(IEnumerable<C1>), typeof(C1))]
+        [InlineData(typeof(C1[]), typeof(C1))]
+        [InlineData(typeof(ValType1?), typeof(ValType1))]
+        [InlineData(typeof(Task<C1>), typeof(C1))]
+        [InlineData(typeof(ValueTask<C1>), typeof(C1))]
+        public void SpecialGenericTypesAreUnwrapped(Type special, Type unwrapped)
         {
-            var members = GqlMemberHelper.MapMembers<PropertyInfo, TestAttr>(typeof(C1));
-            members.Should().Contain(m => m.Key.Name == nameof(C1.NotMarkedProperty));
-        }
+            var specialMapped = GqlMemberHelper.MapMembers<PropertyInfo>(special).Select(i => i.Member).OfType<PropertyInfo>().ToList();
+            var unwrappedMapped = GqlMemberHelper.MapMembers<PropertyInfo>(unwrapped).Select(i => i.Member).OfType<PropertyInfo>().ToList();
 
-        [Fact]
-        public void IgnoredPropertiesAreSkipped()
-        {
-            var members = GqlMemberHelper.MapMembers<PropertyInfo, TestAttr>(typeof(C1));
-            members.Should().NotContain(m => m.Key.Name == nameof(C1.IgnoredProperty));
+            specialMapped.Should().HaveCount(unwrappedMapped.Count);
+
+            specialMapped.Should().AllSatisfy(pi => unwrappedMapped.Contains(pi));
         }
 
         [Fact]
         public void InheritedPropertiesAreMapped()
         {
-            var members = GqlMemberHelper.MapMembers<PropertyInfo, TestAttr>(typeof(C2));
-            members.Should().Contain(m => m.Key.Name == nameof(C1.Property1) && m.Value.Name == TestAttr.DEFAULT_NAME);            
+            var members = GqlMemberHelper.MapMembers<PropertyInfo>(typeof(C2));
+            members.Should().Contain(m => m.Member.Name == nameof(C1.Property1) && m.Attribute.Name == "testName");            
         }
 
-        private class C1
+        [Fact]
+        public void FieldsHaveInfoAboutGqlType()
+        {
+            var members = GqlMemberHelper.MapMembers<PropertyInfo>(typeof(C2));
+
+            var propA1 = members.Single(m => m.Member.Name == nameof(C1.PropertyA1));
+            propA1.GqlTypes.Should().BeEquivalentTo("TYPEA");
+
+            var propA2 = members.Single(m => m.Member.Name == nameof(C1.PropertyB1));
+            propA2.GqlTypes.Should().BeEquivalentTo("TYPEB");
+        }
+
+        private class C1 : IGqlTypeA, IGqlTypeB
         {
             public string? NotMarkedProperty { get; set; }
 
-            [TestAttr(InclusionMode = FieldInclusionMode.Exclude)]
-            public string? IgnoredProperty { get; set; }
+            [Gql(InclusionMode = FieldInclusionMode.Exclude)]
+            public string? ExcludedProperty { get; set; }
 
-            [TestAttr]
+            [Gql("testName")]
             public string? Property1 { get; set; }
+            public string PropertyA1 { get; set; }
+            public string PropertyB1 { get; set; }
         }
 
         private class C2 : C1
         {
-            [TestAttr]
+            [Gql]
             public string? Property2 { get; set; }
-        }
-                
-        private class TestAttr : Attribute, IGqlMember
+        }               
+
+        private struct ValType1
         {
-            public const string DEFAULT_NAME = "default";
-            
+            public int Prop1 { get; set; }
+        }
 
-            
-            public string Name { get; private set; } = "";
-            public FieldInclusionMode InclusionMode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        [GqlTypeFragment("TYPEA")]
+        public interface IGqlTypeA
+        {
+            string PropertyA1 { get; set; }
+        }
 
-            public T CloneWithDefaults<T>(T source, object member) where T : IGqlMember
-            {
-                if(source is not TestAttr ta)
-                    throw new ArgumentException();
-
-                return (T)(object)new TestAttr()
-                {
-                    InclusionMode = ta.InclusionMode,
-                    Name = DEFAULT_NAME
-                };
-            }
+        [GqlTypeFragment("TYPEB")]
+        public interface IGqlTypeB
+        {
+            string PropertyB1 { get; set; }
         }
     }
 }

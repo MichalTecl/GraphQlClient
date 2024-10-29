@@ -1,54 +1,52 @@
 using FluentAssertions;
 using MTecl.GraphQlClient.Utils;
+using System.Linq.Expressions;
 
 namespace MTecl.GraphQlClient.UnitTests
 {
     public class ExpressionTreeHelperTests
     {
         [Fact]
-        public void GetCalledMethod_returnsPassedMethod()
+        public void EvaluateExpression_ShouldReturnConstantValue()
         {
-            int param1 = 1;
-            string param2 = "test";
+            Expression expression = Expression.Constant(42);
 
-            var method = ExpressionTreeHelper.GetCalledMethod<IInterface1, string>(i => i.Method1(param1, param2), out _);
+            var result = ExpressionTreeHelper.EvaluateExpression(expression);
 
-            method.Should().NotBeNull();
-            method.Name.Should().Be(nameof(IInterface1.Method1));
+            Assert.Equal(42, result);
         }
 
         [Fact]
-        public void GetCalledMethod_readsLiteralArgumentValues()
+        public void EvaluateExpression_ShouldEvaluateLambdaExpression()
         {
-            int param1 = 1;
-            string param2 = "test";
+            Expression<Func<int>> expression = () => 100;
 
-            var method = ExpressionTreeHelper.GetCalledMethod<IInterface1, string>(i => i.Method1(param1, param2), out var parameters);
+            var result = ExpressionTreeHelper.EvaluateExpression(expression);
 
-            parameters.Should().HaveCount(2);
-            parameters.Should().ContainKey("param1").WhoseValue.Should().Be(param1);
-            parameters.Should().ContainKey("param2").WhoseValue.Should().Be(param2);                        
+            Assert.Equal(100, result);
         }
 
         [Fact]
-        public void GetCalledMethod_readsDynamicArgumentValues()
-        {     
-            var method = ExpressionTreeHelper.GetCalledMethod<IInterface1, string>(i => 
-            i.Method1(123 + 456 * GetInt(),
-               new string(("123" + "456").Reverse().ToArray())  
-                ), out var parameters);
-
-            parameters.Should().HaveCount(2);
-            parameters.Should().ContainKey("param1").WhoseValue.Should().Be(123 + 456 * GetInt());
-            parameters.Should().ContainKey("param2").WhoseValue.Should().Be(new string(("123" + "456").Reverse().ToArray()));
-        }
-
-
-        public interface IInterface1
+        public void EvaluateExpression_ShouldEvaluateArithmeticExpression()
         {
-            string Method1(int param1, string param2);
+            Expression<Func<int>> expression = () => 5 + 10 * 2;
+
+            var result = ExpressionTreeHelper.EvaluateExpression(expression);
+
+            Assert.Equal(25, result);
         }
 
-        private static int GetInt() => DateTime.Now.Year;
+        [Fact]
+        public void EvaluateExpression_ShouldEvaluateComplexExpressionWithParameters()
+        {
+            ParameterExpression paramA = Expression.Parameter(typeof(int), "a");
+            ParameterExpression paramB = Expression.Parameter(typeof(int), "b");
+            var expressionBody = Expression.Add(paramA, paramB);
+            var lambda = Expression.Lambda(expressionBody, paramA, paramB);
+
+            var result = ExpressionTreeHelper.EvaluateExpression(Expression.Invoke(lambda, Expression.Constant(3), Expression.Constant(7)));
+
+            Assert.Equal(10, result);
+        }
     }
 }

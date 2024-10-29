@@ -1,66 +1,110 @@
-﻿using System;
+﻿using MTecl.GraphQlClient.Utils;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
 {
     internal class GqlMemberHelper
-    {        
-        private static readonly ConcurrentDictionary<string, object> _cache = new ConcurrentDictionary<string, object>();
+    {
+        private static readonly ConcurrentDictionary<string, List<MappedMemberInfo>> _cache = new ConcurrentDictionary<string, List<MappedMemberInfo>>();
 
-        public static Dictionary<TMember, TAttribute> MapMembers<TMember, TAttribute>(Type type, bool unwrapType = true) 
+        public static List<MappedMemberInfo> MapMembers<TMember>(Type type, bool unwrapType = true) 
             where TMember : MemberInfo 
-            where TAttribute : class, IGqlMember, new()
         {
             if (unwrapType)
                 type = UnwrapType(type);
 
-            var ckey = typeof(TMember).FullName + typeof(TAttribute).FullName + type.FullName;
+            var ckey = typeof(TMember).FullName + type.FullName;
 
-            Dictionary <TMember, TAttribute> Map()                    
+            List<MappedMemberInfo> Map()                    
             {
-                var result = new Dictionary<TMember, TAttribute>();
+                var result = new List<MappedMemberInfo>();
 
                 foreach (var m in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy).OfType<TMember>())
                 {
-                    var attr = MapMember<TAttribute>(m);                    
-                    result.Add(m, attr);
+                    var mapped = MapMember(m);                    
+                    result.Add(mapped);
                 }
 
                 return result;
             }
 
-            return (Dictionary<TMember, TAttribute>)_cache.GetOrAdd(ckey, _ => Map());
+            return _cache.GetOrAdd(ckey, _ => Map());
         }
 
-        public static TAttribute MapMember<TAttribute>(MemberInfo m) where TAttribute : class, IGqlMember, new()
+        public static MappedMemberInfo MapMember(MemberInfo m)
         {
-            return MapMember<TAttribute>(m, m.Name, m.GetCustomAttributes());
+            return MapMember(m, m.Name, m.GetCustomAttributes());
         }
 
-        public static TAttribute MapMember<TAttribute>(object member, string memberName, IEnumerable<Attribute> memberAttributes) where TAttribute : class, IGqlMember, new()
+        public static MappedMemberInfo MapMember(MemberInfo member, string memberName, IEnumerable<Attribute> memberAttributes) 
         {
-            var attr = memberAttributes.OfType<TAttribute>().FirstOrDefault() ?? new TAttribute();
-            return attr.CloneWithDefaults(attr, member);
+            var attr = memberAttributes.OfType<IGqlMember>().FirstOrDefault() ?? new GqlAttribute();
+
+            var belongsToTypes = ReflectionHelper.GetDefiningInterfaces(member)
+                   .OfType<Type>()
+                   .Select(iface => iface.GetCustomAttributes().OfType<IGraphQlType>().FirstOrDefault()?.TypeName)
+                   .Where(tn => tn != null)
+                   .Distinct()
+                   .ToArray();
+
+            return new MappedMemberInfo(member, attr.CloneWithDefaults(attr, member), belongsToTypes);
+        }
+
+        public static MappedMemberInfo MapParameter(ParameterInfo member, IEnumerable<Attribute> memberAttributes)
+        {
+            var attr = memberAttributes.OfType<IGqlMember>().FirstOrDefault() ?? new GqlAttribute();
+            return new MappedMemberInfo(member, attr.CloneWithDefaults(attr, member));
         }
 
         private static Type UnwrapType(Type type)
-        {            
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (type == typeof(string))
+                return type;
+                        
+            if (type.IsGenericType)
             {
-                return Nullable.GetUnderlyingType(type);
+                var genericTypeDef = type.GetGenericTypeDefinition(); 
+
+                if (genericTypeDef == typeof(Task<>) || genericTypeDef == typeof(ValueTask<>))
+                    return type.GetGenericArguments().FirstOrDefault() ?? type;
+
+                if (typeof(IEnumerable).IsAssignableFrom(genericTypeDef))
+                    return type.GetGenericArguments().FirstOrDefault() ?? type;
             }
                         
-            if (type != typeof(string) && (type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type.GetGenericTypeDefinition())))
-            {
-                return type.GetGenericArguments().FirstOrDefault() ?? type;
-            }
-                        
+            if (type.IsArray)
+                return type.GetElementType();
+            
             return type;
+        }
+
+        public sealed class MappedMemberInfo
+        {
+            public MappedMemberInfo(MemberInfo member, IGqlMember attribute, string[] gqlTypes)
+            {
+                Member = member;
+                Attribute = attribute;
+                GqlTypes = gqlTypes;
+            }
+
+            public MappedMemberInfo(ParameterInfo parameter, IGqlMember attribute) : this(null, attribute, new string[0])
+            {
+                Parameter = parameter;
+            }
+
+            public MemberInfo Member { get; }
+            public ParameterInfo Parameter { get; }
+            public IGqlMember Attribute { get; }
+            public string[] GqlTypes { get; }
         }
     }
 }

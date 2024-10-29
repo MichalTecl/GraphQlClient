@@ -16,7 +16,7 @@ namespace MTecl.GraphQlClient
         [TreeVisitor(typeof(WithVisitor))]
         public static object With<T>(this T src, params Func<T, object>[] f) => Nope();
                 
-        [TreeVisitor(typeof(WithFragmetOnVisitor))]
+        [TreeVisitor(typeof(WithFragmentOnVisitor))]
         public static object WithFragmentOn<T>(this T src, string typeName, params Func<T, object>[] f) => Nope();
 
         private static object Nope([CallerMemberName] string callerName = "") 

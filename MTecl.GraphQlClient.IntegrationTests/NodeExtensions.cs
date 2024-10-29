@@ -46,5 +46,9 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             return n;
         }
+
+        public static FieldNode? Field(this INode? parent, string name) => parent?.FindChild(name, false);
+        public static InlineFragmentNode? Fragment(this INode? parent, string typeName) => parent?.Nodes.Filtered.OfType<InlineFragmentNode>().FirstOrDefault(n => n.OnType == typeName);
+       
     }
 }

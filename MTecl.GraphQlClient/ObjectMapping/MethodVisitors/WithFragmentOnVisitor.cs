@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MTecl.GraphQlClient.ObjectMapping.MethodVisitors
 {
-    internal class WithFragmetOnVisitor : IMethodVisitor
+    internal class WithFragmentOnVisitor : IMethodVisitor
     {
         public INode Visit(INode parent, MethodCallExpression expression)
         {

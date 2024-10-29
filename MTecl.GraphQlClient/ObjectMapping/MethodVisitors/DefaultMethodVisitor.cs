@@ -24,26 +24,39 @@ namespace MTecl.GraphQlClient.ObjectMapping.Visitors
 
             parent.Nodes.Add(methodNode);
 
-            var methodArguments = mce.Method.GetParameters().Select(p => GqlMemberHelper.MapMember<GqlAttribute>(p, p.Name, p.GetCustomAttributes())).ToList();
+            var methodArguments = mce.Method.GetParameters().Select(p => GqlMemberHelper.MapParameter(p, p.GetCustomAttributes())).ToList();
 
             for(var paramIndex  = 0; paramIndex < Math.Min(expression.Arguments.Count, methodArguments.Count); paramIndex++)
             {
                 var methodArgument = methodArguments[paramIndex];
 
                 var value = ResolveArgumentValue(mce.Arguments[paramIndex]);
-                methodNode.Arguments.Add(new KeyValuePair<string, object>(methodArgument.Name, value));
+                methodNode.Arguments.Add(new KeyValuePair<string, object>(methodArgument.Attribute.Name, value));
             }
 
             return methodNode;
         }
 
         private object ResolveArgumentValue(Expression expression)
-        {            
+        {
+            if (expression is UnaryExpression unr && unr.NodeType == ExpressionType.Convert)
+                return ResolveArgumentValue(unr.Operand);
+
             if (expression is MemberExpression mex && QueryVariable.IsValueProperty(mex.Member))
             {
                 var owner = ExpressionTreeHelper.EvaluateExpression(mex.Expression) as QueryVariable;
                 if (owner != null)
                     return owner.RenderToQuery();
+            }
+
+            else if (expression is MethodCallExpression mce && QueryVariable.IsPassMethod(mce.Method))
+            {
+                var objValue = ResolveArgumentValue(mce.Arguments[0]);
+                var varNameStr = objValue as string;
+                if (string.IsNullOrEmpty(varNameStr))
+                    return objValue;
+
+                return QueryVariable.GetVariableNameRenderer(varNameStr);
             }
 
             return ExpressionTreeHelper.EvaluateExpression(expression);
