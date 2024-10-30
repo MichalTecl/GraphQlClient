@@ -22,6 +22,21 @@ namespace MTecl.GraphQlClient
         [TreeVisitor(typeof(ArgumentMethodVisitor))]
         public static T Argument<T>(this T src, object arguments) => (T)Nope();
 
+        [TreeVisitor(typeof(ArgumentMethodVisitor))]
+        public static T Argument<T>(this T src, Dictionary<string, object> arguments) => (T)Nope();
+
+        [TreeVisitor(typeof(IsAliasForVisitor))]
+        public static T IsAliasFor<T>(this T src, string aliasedFieldName) => (T)Nope();
+
+        [TreeVisitor(typeof(IsAliasForVisitor))]
+        public static T IsAliasFor<T>(this T src, string aliasedFieldName, string argumentName, object argumentValue) => (T)Nope();
+
+        [TreeVisitor(typeof(IsAliasForVisitor))]
+        public static T IsAliasFor<T>(this T src, string aliasedFieldName, Dictionary<string, object> arguments) => (T)Nope();
+
+        [TreeVisitor(typeof(IsAliasForVisitor))]
+        public static T IsAliasFor<T>(this T src, string aliasedFieldName, object arguments) => (T)Nope();
+
         private static object Nope([CallerMemberName] string callerName = "") 
         {
             throw new InvalidOperationException($"The {callerName} method should be used only in expression tree. Direct call is not permitted.");

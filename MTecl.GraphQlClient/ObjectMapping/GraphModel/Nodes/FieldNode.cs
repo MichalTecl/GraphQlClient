@@ -9,24 +9,26 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
     {
         public string Name { get; set; }
 
-        public string Alias { get; set; }
+        public string IsAliasFor { get; set; }
 
         public List<KeyValuePair<string, object>> Arguments { get; } = new List<KeyValuePair<string, object>>();
 
-        public override string NodeId => Alias ?? Name;
+        public override string NodeId => Name;
 
         public override bool IsImportant => Arguments.Count > 0 || Nodes.Count > 0;
 
         protected override void Render(RenderHelper renderHelper)
         {
             renderHelper.Indent(Level);
-            
-            if (!string.IsNullOrEmpty(Alias))
-            {
-                renderHelper.Literal(Alias).Literal(": ");
-            }
 
-            renderHelper.Literal(Name);
+            if (!string.IsNullOrEmpty(IsAliasFor))
+            {
+                renderHelper.Literal(Name).Literal(": ").Literal(IsAliasFor);
+            }
+            else
+            {
+                renderHelper.Literal(Name);
+            }
 
             if (Arguments.Count > 0) 
             {
