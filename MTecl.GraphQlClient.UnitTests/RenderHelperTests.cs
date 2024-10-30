@@ -13,7 +13,7 @@ namespace MTecl.GraphQlClient.UnitTests
         public void Constructor_InitializesWithEmptyStringBuilder()
         {
             // Act
-            var renderHelper = new RenderHelper();
+            var renderHelper = new RenderHelper(RenderOptions.Default);
 
             // Assert
             Assert.NotNull(renderHelper.StringBuilder);
@@ -25,7 +25,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.Indent(3);
@@ -39,7 +39,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.Literal("test");
@@ -53,7 +53,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.OpenArgumentList();
@@ -67,7 +67,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.CloseArgumentList();
@@ -81,7 +81,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.OpenArgumentList().Argument("name", "value").CloseArgumentList();
@@ -95,7 +95,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.OpenArgumentList().Argument("name", null).CloseArgumentList();
@@ -109,7 +109,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.CrLf();
@@ -123,7 +123,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.OpenCodeBlock();
@@ -137,7 +137,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.CloseCodeBlock();
@@ -151,7 +151,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.Write(new SelfRendered());
@@ -166,7 +166,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             // Arrange
             var sb = new StringBuilder();
-            var renderHelper = new RenderHelper(sb);
+            var renderHelper = new RenderHelper(sb, RenderOptions.Default);
 
             // Act
             renderHelper.Argument("a1", new SelfRendered());

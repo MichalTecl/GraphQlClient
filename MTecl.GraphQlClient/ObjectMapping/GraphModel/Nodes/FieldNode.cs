@@ -1,4 +1,5 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.Rendering;
+using MTecl.GraphQlClient.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,14 +21,14 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
         protected override void Render(RenderHelper renderHelper)
         {
             renderHelper.Indent(Level);
-
+                        
             if (!string.IsNullOrEmpty(IsAliasFor))
-            {
-                renderHelper.Literal(Name).Literal(": ").Literal(IsAliasFor);
+            {            
+                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.RenderOptions)).Literal(": ").Literal(IsAliasFor);
             }
             else
             {
-                renderHelper.Literal(Name);
+                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.RenderOptions));
             }
 
             if (Arguments.Count > 0) 
@@ -45,7 +46,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
             {
                 renderHelper.OpenCodeBlock();
                 foreach (var child in Nodes.Filtered)
-                    child.Render(renderHelper.StringBuilder);
+                    child.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
                 renderHelper.Indent(Level).CloseCodeBlock();
             }
             else

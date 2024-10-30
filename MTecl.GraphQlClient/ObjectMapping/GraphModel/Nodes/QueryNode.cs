@@ -14,7 +14,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
         protected override void Render(RenderHelper renderHelper)
         {
             renderHelper.Literal("query: ").OpenCodeBlock();
-            Nodes.Render(renderHelper.StringBuilder);
+            Nodes.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
             renderHelper.CloseCodeBlock();
         }
     }

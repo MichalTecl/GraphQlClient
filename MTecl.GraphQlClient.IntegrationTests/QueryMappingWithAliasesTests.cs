@@ -33,7 +33,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var rendered = query.ToString();
 
-            rendered.Should().ContainAll("BigProfilePicture: ProfilePicture(size: 1024)", "SmallProfilePicture: ProfilePicture(size: 64)");
+            rendered.Should().ContainAll("bigProfilePicture: ProfilePicture(size: 1024)", "smallProfilePicture: ProfilePicture(size: 64)");
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var rendered = query.ToString();
 
-            rendered.Should().ContainAll("BigProfilePicture: ProfilePicture(size: 1024)", "SmallProfilePicture: ProfilePicture(size: 64)");
+            rendered.Should().ContainAll("bigProfilePicture: ProfilePicture(size: 1024)", "smallProfilePicture: ProfilePicture(size: 64)");
         }
 
         class User

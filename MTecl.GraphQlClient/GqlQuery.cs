@@ -61,7 +61,7 @@ namespace MTecl.GraphQlClient
             options.CustomizeQueryGraph?.Invoke(built);
 
             var sb = new StringBuilder();
-            built.Render(sb);
+            built.Render(sb, options.RenderOptions);
             var query = sb.ToString();
 
             if (options.CustomizeQueryText != null)

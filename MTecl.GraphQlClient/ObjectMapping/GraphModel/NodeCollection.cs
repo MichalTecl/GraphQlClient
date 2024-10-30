@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MTecl.GraphQlClient.ObjectMapping.Rendering;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,10 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
             return _nodes.Contains(item);
         }
 
-        public void Render(StringBuilder stringBuilder)
+        public void Render(StringBuilder stringBuilder, RenderOptions renderOptions)
         {
             foreach (var n in _nodes)
-                n.Render(stringBuilder);
+                n.Render(stringBuilder, renderOptions);
         }
 
         public IEnumerable<INode> Remove(Func<INode, bool> predicate)

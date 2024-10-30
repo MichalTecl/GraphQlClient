@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Web;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering
@@ -9,15 +11,19 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
     {
         private readonly StringBuilder _sb;
         private int _lastIndent = 0;
+        private readonly RenderOptions _renderOptions;
 
-        public RenderHelper(StringBuilder sb)
+        public RenderHelper(StringBuilder sb, RenderOptions renderOptions)
         {
             _sb = sb;
+            _renderOptions = renderOptions;
         }
 
-        public RenderHelper() : this(new StringBuilder()) {}
+        public RenderHelper(RenderOptions renderOptions) : this(new StringBuilder(), renderOptions) {}
 
         public StringBuilder StringBuilder => _sb;
+
+        public RenderOptions RenderOptions => _renderOptions;
 
         public RenderHelper Indent(int level)
         {
@@ -68,15 +74,11 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
             {
                 rmsf.Render(_lastIndent, _sb);
             }
-            else if (value is string s)
-            {
-                _sb.Append(HttpUtility.JavaScriptStringEncode(s, true));
-            }
             else
             {
-                _sb.Append(value.ToString());
+                _sb.Append(JsonSerializer.Serialize(value, _renderOptions.JsonSerializerOptions ?? new JsonSerializerOptions()));
             }
-
+            
             return this;
         }
 

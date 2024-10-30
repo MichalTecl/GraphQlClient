@@ -34,8 +34,8 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var rendered = query.ToString();
 
-            rendered.Should().Contain("Orders(orderNr: \"1234\", country: \"cz\")");
-            rendered.Should().Contain("Customer(e-mail: \"*@gmail.com\")");
+            rendered.Should().Contain("orders(orderNr: \"1234\", country: \"cz\")");
+            rendered.Should().Contain("customer(e-mail: \"*@gmail.com\")");
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
             ordersNode.Arguments[0].Value.ToString().Should().Be("$v1");
 
             var rendered = query.ToString();
-            rendered.Should().Contain("Orders(orderNr: $v1)");
+            rendered.Should().Contain("orders(orderNr: $v1)");
         }
 
         [Fact]
@@ -81,8 +81,8 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var rendered = query.ToString();
 
-            rendered.Should().Contain("Orders(orderNr: \"1234\", country: \"cz\")");
-            rendered.Should().Contain("Customer(email: $v1)");
+            rendered.Should().Contain("orders(orderNr: \"1234\", country: \"cz\")");
+            rendered.Should().Contain("customer(email: $v1)");
         }
 
         [Fact]
@@ -112,8 +112,8 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var rendered = query.ToString();
 
-            rendered.Should().Contain("Orders(orderNr: \"1234\", country: \"cz\")");
-            rendered.Should().Contain("Customer(email: $v1)");
+            rendered.Should().Contain("orders(orderNr: \"1234\", country: \"cz\")");
+            rendered.Should().Contain("customer(email: $v1)");
         }
 
         class OrdersQuery

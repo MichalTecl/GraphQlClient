@@ -16,7 +16,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
         protected override void Render(RenderHelper renderHelper)
         {
             renderHelper.Indent(Level).Literal(NodeId).OpenCodeBlock();
-            Nodes.Render(renderHelper.StringBuilder);
+            Nodes.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
             renderHelper.Indent(Level).CloseCodeBlock();
         }
     }

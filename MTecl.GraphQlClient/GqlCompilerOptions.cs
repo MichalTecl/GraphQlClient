@@ -1,4 +1,5 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.GraphModel;
+using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,8 @@ namespace MTecl.GraphQlClient
         public Action<INode> CustomizeQueryGraph { get; set; }
 
         public Func<string, string> CustomizeQueryText { get; set; }
+
+        public RenderOptions RenderOptions { get; set; } = RenderOptions.Default;
                 
         public interface IGraphQlRequestBodySerializer
         {

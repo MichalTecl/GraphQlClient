@@ -23,9 +23,9 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
         public abstract bool IsImportant { get; }
         public Expression Expression { get; set; }
 
-        public void Render(StringBuilder sb)
+        public void Render(StringBuilder sb, RenderOptions renderOptions)
         {
-            Render(new RenderHelper(sb));
+            Render(new RenderHelper(sb, renderOptions));
         }
 
         protected abstract void Render(RenderHelper renderHelper);
@@ -33,7 +33,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
         public override string ToString()
         {
             var sb = new StringBuilder();
-            Render(sb);
+            Render(sb, RenderOptions.Default);
 
             return sb.ToString();
         }

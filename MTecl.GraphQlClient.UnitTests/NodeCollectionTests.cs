@@ -1,4 +1,5 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.GraphModel;
+using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace MTecl.GraphQlClient.UnitTests
             public string NodeId { get; set; }
             public Expression Expression { get; set; }
 
-            public void Render(StringBuilder stringBuilder) => stringBuilder.Append($"Node{NodeId}");
+            public void Render(StringBuilder stringBuilder, RenderOptions o) => stringBuilder.Append($"Node{NodeId}");
         }
 
         [Fact]
