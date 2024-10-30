@@ -11,27 +11,29 @@ namespace MTecl.GraphQlClient.IntegrationTests
         {
             var query = QueryMapper.MapQuery<UsersQuery>(u => u.Users
                 .With(
-                u => u.BigProfilePictureUrl.IsAliasFor("profilePictureUrl", "size", 1024),
-                u => u.SmallProfilePictureUrl.IsAliasFor("profilePictureUrl", "size", 64)));
+                u => u.BigProfilePicture.IsAliasFor("ProfilePicture", "size", 1024),
+                u => u.SmallProfilePicture.IsAliasFor("ProfilePicture", "size", 64)));
 
             var usersNode = query.FindChild("Users");
             usersNode.Should().NotBeNull();
 
             usersNode.Nodes.Filtered.Should().HaveCount(3);
 
-            var bigPp = usersNode.FindChild("BigProfilePictureUrl");
+            var bigPp = usersNode.FindChild("BigProfilePicture");
             bigPp.Should().NotBeNull();
-            bigPp.IsAliasFor.Should().Be("profilePictureUrl");
+            bigPp.IsAliasFor.Should().Be("ProfilePicture");
             bigPp.Arguments.Should().HaveCount(1);
             bigPp.Arguments[0].Should().BeEquivalentTo(new KeyValuePair<string, object> ("size", 1024));
 
-            var smallPp = usersNode.FindChild("SmallProfilePictureUrl");
+            var smallPp = usersNode.FindChild("SmallProfilePicture");
             smallPp.Should().NotBeNull();
-            smallPp.IsAliasFor.Should().Be("profilePictureUrl");
+            smallPp.IsAliasFor.Should().Be("ProfilePicture");
             smallPp.Arguments.Should().HaveCount(1);
             smallPp.Arguments[0].Should().BeEquivalentTo(new KeyValuePair<string, object>("size", 64));
 
             var rendered = query.ToString();
+
+            rendered.Should().ContainAll("BigProfilePicture: ProfilePicture(size: 1024)", "SmallProfilePicture: ProfilePicture(size: 64)");
         }
 
         [Fact]
@@ -39,24 +41,54 @@ namespace MTecl.GraphQlClient.IntegrationTests
         {
             var query = QueryMapper.MapQuery<UsersQuery>(u => u.Users
                 .With(
-                u => u.BigProfilePictureUrl.IsAliasFor("profilePictureUrl").Argument("size", 1024),
-                u => u.SmallProfilePictureUrl.IsAliasFor("profilePictureUrl").Argument("size", 64)));
+                u => u.BigProfilePicture.IsAliasFor("ProfilePicture").Argument("size", 1024).With(i => i.Format),
+                u => u.SmallProfilePicture.Argument("size", 64).IsAliasFor("ProfilePicture").With(i => i.Format)));
+
+            var usersNode = query.FindChild("Users");
+            usersNode.Should().NotBeNull();
+
+            usersNode.Nodes.Filtered.Should().HaveCount(3);
+
+            var bigPp = usersNode.FindChild("BigProfilePicture");
+            bigPp.Should().NotBeNull();
+            bigPp.IsAliasFor.Should().Be("ProfilePicture");
+            bigPp.Arguments.Should().HaveCount(1);
+            bigPp.Arguments[0].Should().BeEquivalentTo(new KeyValuePair<string, object>("size", 1024));
+
+            var smallPp = usersNode.FindChild("SmallProfilePicture");
+            smallPp.Should().NotBeNull();
+            smallPp.IsAliasFor.Should().Be("ProfilePicture");
+            smallPp.Arguments.Should().HaveCount(1);
+            smallPp.Arguments[0].Should().BeEquivalentTo(new KeyValuePair<string, object>("size", 64));
 
             var rendered = query.ToString();
+
+            rendered.Should().ContainAll("BigProfilePicture: ProfilePicture(size: 1024)", "SmallProfilePicture: ProfilePicture(size: 64)");
         }
 
         class User
         {
             public string Id { get; set; }
-            public string BigProfilePictureUrl { get; set; }
-            public string SmallProfilePictureUrl { get; set; }
+            public Picture BigProfilePicture { get; set; }
+            public Picture SmallProfilePicture { get; set; }
         }
 
         class UsersQuery
         {
             public List<User> Users { get; set; }
         }
-       
+
+        class Picture
+        {
+            public string Url { get; set; }
+            public ImageFormat Format { get; set; }
+        }
+
+        class ImageFormat
+        {
+            public string Extension { get; set; }
+            public string Name { get; set; }
+        }
     }
 }
 

@@ -11,31 +11,22 @@ using System.Threading.Tasks;
 namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
 {
     internal class GqlMemberHelper
-    {
-        private static readonly ConcurrentDictionary<string, List<MappedMemberInfo>> _cache = new ConcurrentDictionary<string, List<MappedMemberInfo>>();
-
+    {        
         public static List<MappedMemberInfo> MapMembers<TMember>(Type type, bool unwrapType = true) 
             where TMember : MemberInfo 
         {
             if (unwrapType)
                 type = UnwrapType(type);
 
-            var ckey = typeof(TMember).FullName + type.FullName;
+            var result = new List<MappedMemberInfo>();
 
-            List<MappedMemberInfo> Map()                    
+            foreach (var m in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy).OfType<TMember>())
             {
-                var result = new List<MappedMemberInfo>();
-
-                foreach (var m in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy).OfType<TMember>())
-                {
-                    var mapped = MapMember(m);                    
-                    result.Add(mapped);
-                }
-
-                return result;
+                var mapped = MapMember(m);                    
+                result.Add(mapped);
             }
 
-            return _cache.GetOrAdd(ckey, _ => Map());
+            return result;
         }
 
         public static MappedMemberInfo MapMember(MemberInfo m)
