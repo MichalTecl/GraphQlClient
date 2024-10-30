@@ -52,6 +52,8 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
         private static INode VisitMethod(INode parent, MethodCallExpression mce)
         {
+
+
             var visitor = ResolveVisitor(mce.Method);
 
             return visitor.Visit(parent, mce);
@@ -73,16 +75,23 @@ namespace MTecl.GraphQlClient.ObjectMapping
             while (e is LambdaExpression lex)
                 e = lex.Body;
 
+            INode created = null;
+
             if (e is UnaryExpression unr && unr.NodeType == ExpressionType.Convert)
-                return Visit(parent, unr.Operand);
+                created = Visit(parent, unr.Operand);
 
             if (e is MethodCallExpression mce)
-                return VisitMethod(parent, mce);
+                created = VisitMethod(parent, mce);
 
             if (e is MemberExpression pe)
-                return VisitMember(parent, pe);
-                        
-            throw new NotSupportedException($"Unexpected type of expression {e.GetType().Name}: {e}");
+                created = VisitMember(parent, pe);
+
+            if (created == null)
+                throw new NotSupportedException($"Unexpected type of expression {e.GetType().Name}: {e}");
+
+            created.Expression = e;
+
+            return created;
         }
 
         private static INode VisitMember(INode parent, MemberExpression pe)

@@ -37,14 +37,17 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables
                 && typeof(QueryVariable).IsAssignableFrom(pi.DeclaringType)); 
         }
 
-        public static T Pass<T>(string name) { return default; }
+        public static T Pass<T>(string name) 
+        {
+            throw new InvalidOperationException($"The {nameof(Pass)}<T> method is just a placeholder in expression tree. If you need to place the variable name into arguemtns object, use {nameof(GetVariableNameRenderer)} method");
+        }
 
         internal static bool IsPassMethod(MethodInfo method)
         {
             return method.Name == nameof(Pass) && method.DeclaringType == typeof(QueryVariable);
         }
 
-        internal static IRenderMyself GetVariableNameRenderer(string value)
+        public static IRenderMyself GetVariableNameRenderer(string value)
         {
             return new VariableName(value);
         }

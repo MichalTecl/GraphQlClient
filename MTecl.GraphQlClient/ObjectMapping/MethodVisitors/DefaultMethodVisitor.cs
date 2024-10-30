@@ -37,7 +37,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Visitors
             return methodNode;
         }
 
-        private object ResolveArgumentValue(Expression expression)
+        internal static object ResolveArgumentValue(Expression expression)
         {
             if (expression is UnaryExpression unr && unr.NodeType == ExpressionType.Convert)
                 return ResolveArgumentValue(unr.Operand);

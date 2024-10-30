@@ -1,6 +1,7 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
@@ -20,6 +21,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
 
         public abstract string NodeId { get; }
         public abstract bool IsImportant { get; }
+        public Expression Expression { get; set; }
 
         public void Render(StringBuilder sb)
         {
