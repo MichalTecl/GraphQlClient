@@ -14,7 +14,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void TestPassMethod()
         {
-            var query = QueryMapper.MapQuery<IFlowerQuery>(f => f.GetFlowers(QueryVariable.Pass<string>("$v1"), QueryVariable.Pass<bool>("$v2")));
+            var query = QueryMapper.MapQuery<IFlowerQuery, IEnumerable<Flower>>(f => f.GetFlowers(QueryVariable.Pass<string>("$v1"), QueryVariable.Pass<bool>("$v2")));
 
             var methodNode = query.FindChild(nameof(IFlowerQuery.GetFlowers));
             methodNode.Arguments.Should().HaveCount(2);

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient
 {
-    public class GqlQuery<T>
+    public class GqlQuery<TResult>
     {
         private readonly string _queryBody;
         
@@ -22,7 +22,7 @@ namespace MTecl.GraphQlClient
             _queryBody = query;
         }
 
-        public async Task<T> ExecuteAsync(HttpClient httpClient, GqlRequestOptions options = null, CancellationToken ct = default)
+        public async Task<TResult> ExecuteAsync(HttpClient httpClient, GqlRequestOptions options = null, CancellationToken ct = default)
         {
             options = options ?? new GqlRequestOptions();
 
@@ -31,11 +31,14 @@ namespace MTecl.GraphQlClient
             string responseString = null;
             using (var httpRequestMessage = options.RequestMessageBuilder.CreateHttpRequestMessage(uri, options.CustomRequestHeaders, _queryBody, options.Encoding))
             {
+                options.RawRequestPeek(_queryBody);
+
                 using (var response = await httpClient.SendAsync(httpRequestMessage, ct))
                 {
                     try
                     {
                         responseString = await response.Content.ReadAsStringAsync();
+                        options.RawResponsePeek(responseString);
                     }
                     catch {; }
 
@@ -46,10 +49,10 @@ namespace MTecl.GraphQlClient
                 }
             }
 
-            return options.ResponseDeserializer.DeserializeResponse<T>(responseString, options.JsonNamingPolicy);
+            return options.ResponseDeserializer.DeserializeResponse<TResult>(responseString, options.JsonSerializerOptions);
         }
 
-        public static GqlQuery<TResult> Build<TResult>(Expression<Func<TResult, object>> expression, GqlCompilerOptions options = null)
+        public static GqlQuery<TResult> Build<TQueryType>(Expression<Func<TQueryType, TResult>> expression, GqlCompilerOptions options = null)
         {
             options = options ?? GqlCompilerOptions.Default;
 

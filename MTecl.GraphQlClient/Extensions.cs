@@ -11,10 +11,13 @@ namespace MTecl.GraphQlClient
     public static class Extensions
     {
         [TreeVisitor(typeof(WithVisitor))]
-        public static object With<T>(this IEnumerable<T> src, params Func<T, object>[] f) => Nope();
-        
+        public static IEnumerable<T> With<T>(this IEnumerable<T> src, params Func<T, object>[] f) => (IEnumerable<T>)Nope();
+
         [TreeVisitor(typeof(WithVisitor))]
-        public static object With<T>(this T src, params Func<T, object>[] f) => Nope();
+        public static List<T> With<T>(this List<T> src, params Func<T, object>[] f) => (List<T>)Nope();
+
+        [TreeVisitor(typeof(WithVisitor))]
+        public static T With<T>(this T src, params Func<T, object>[] f) => (T)Nope();
                 
         [TreeVisitor(typeof(ArgumentMethodVisitor))]
         public static T Argument<T>(this T src, string Name, object value) => (T)Nope();

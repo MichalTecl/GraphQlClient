@@ -9,7 +9,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void MethodWithoutParametersIsProjectedAsField()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals());
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -21,7 +21,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void MethodWithoutParametersIsProjectedAsFieldWithArguments()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.FindAnimals("eleph", 10, 1000));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.FindAnimals("eleph", 10, 1000));
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -37,7 +37,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void MethodReturnTypeProjectedAsComplexType()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals());
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
 
             var methodNode = query.FindChild("animals");
 
@@ -50,7 +50,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void PrimitiveTypeFieldsCanBeExcludedByAttribute()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals());
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -61,7 +61,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ExcludedFieldsCanBeIncludedByWith()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.Id));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.Id));
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -72,7 +72,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void MultipleExcludedFieldsCanBeIncludedByWith()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.Id, a => a.InsertUserId));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.Id, a => a.InsertUserId));
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -84,7 +84,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ComplexTypeFieldsAreByDefaultExcluded()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals());
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();
@@ -95,7 +95,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ComplexTypeFieldsCanBeIncludedByWith()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.Territories));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.Territories));
 
             var methodNode = query.FindChildPath("animals", "territories", "name").Should().NotBeNull();
         }
@@ -103,7 +103,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void WithInsideOfWith()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.Territories.With(t => t.Id)));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.Territories.With(t => t.Id)));
 
             query.FindChildPath("animals", "territories", "id").Should().NotBeNull();
         }
@@ -111,7 +111,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void WithInsideOfWith2()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.DimensionsWhenBorn.With(d => d.InformationSource)));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.DimensionsWhenBorn.With(d => d.InformationSource)));
 
             query.FindChildPath("animals", "dimensions_when_born", "information_source").Should().NotBeNull();
         }
@@ -119,7 +119,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void WithInclusionsOfPropertiesCanBeChained()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.DimensionsWhenBorn.InformationSource));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.DimensionsWhenBorn.InformationSource));
 
             query.FindChildPath("animals", "dimensions_when_born", "information_source").Should().NotBeNull();
         }
@@ -127,7 +127,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void WithInclusionsOfPropertiesCanBeChained2()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.FindTerritory("filter").Id));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.FindTerritory("filter").Id));
 
             query.FindChildPath("animals", "territory", "id").Should().NotBeNull();
         }
@@ -135,7 +135,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void IncludedFieldsShouldNotHaveSubfields()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals().With(a => a.Name));
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals().With(a => a.Name));
             var nameNode = query.FindChildPath("animals", "name");
 
             nameNode.Should().NotBeNull();
@@ -146,7 +146,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ComplexTypeFieldsCanBeIncludedByAttribute()
         {
-            var query = QueryMapper.MapQuery<AnimalsQuery>(q => q.GetAnimals());
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
 
             var methodNode = query.FindChild("animals");
             methodNode.Should().NotBeNull();

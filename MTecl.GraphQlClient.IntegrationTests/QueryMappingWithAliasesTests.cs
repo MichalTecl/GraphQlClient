@@ -9,7 +9,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void AliasWithArgumentPassedAsNameValue()
         {
-            var query = QueryMapper.MapQuery<UsersQuery>(u => u.Users
+            var query = QueryMapper.MapQuery<UsersQuery, List<User>>(u => u.Users
                 .With(
                 u => u.BigProfilePicture.IsAliasFor("ProfilePicture", "size", 1024),
                 u => u.SmallProfilePicture.IsAliasFor("ProfilePicture", "size", 64)));
@@ -39,7 +39,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void AliasCombinedWithArgument()
         {
-            var query = QueryMapper.MapQuery<UsersQuery>(u => u.Users
+            var query = QueryMapper.MapQuery<UsersQuery, List<User>>(u => u.Users
                 .With(
                 u => u.BigProfilePicture.IsAliasFor("ProfilePicture").Argument("size", 1024).With(i => i.Format),
                 u => u.SmallProfilePicture.Argument("size", 64).IsAliasFor("ProfilePicture").With(i => i.Format)));

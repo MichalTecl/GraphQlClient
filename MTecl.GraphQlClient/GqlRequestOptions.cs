@@ -1,4 +1,5 @@
 ﻿using MTecl.GraphQlClient.Exceptions;
+using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -13,6 +14,10 @@ namespace MTecl.GraphQlClient
 
         public Uri RequestUri { get; set; }
 
+        public Action<string> RawRequestPeek { get; set; } = _ => {; };
+
+        public Action<string> RawResponsePeek { get; set; } = _ => {; };
+
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         public IRequestMessageBuilder RequestMessageBuilder { get; set; } = DefaultRequestMessageBuilder.Instance;
@@ -25,7 +30,7 @@ namespace MTecl.GraphQlClient
             HttpRequestMessage CreateHttpRequestMessage(Uri uri, Dictionary<string, string> headers, string body, Encoding encoding);
         }
 
-        public JsonNamingPolicy JsonNamingPolicy { get; set; } = JsonNamingPolicy.CamelCase;
+        public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions();
 
         private sealed class DefaultRequestMessageBuilder : IRequestMessageBuilder
         {
@@ -51,54 +56,7 @@ namespace MTecl.GraphQlClient
 
         public interface IResponseDeserializer
         {
-            T DeserializeResponse<T>(string response, JsonNamingPolicy namingPolicy);
-        }
-
-        private sealed class DefaultResponseDeserializer : IResponseDeserializer
-        {
-            public static readonly DefaultResponseDeserializer Instance = new DefaultResponseDeserializer();
-
-            public T DeserializeResponse<T>(string response, JsonNamingPolicy namingPolicy)
-            {
-                var container = JsonSerializer.Deserialize<ResponseModel<T>>(response, new JsonSerializerOptions { PropertyNamingPolicy = namingPolicy });
-
-                if (container.errors != null && container.errors.Count > 0)
-                    throw new ServerErrorResponseException(container.GetErrorsText());
-
-                return container.data;
-            }
-
-            private sealed class ResponseModel<T>
-            {
-                public T data { get; set; }
-
-                public List<ErrorModel> errors { get; set; }
-
-                public string GetErrorsText() => string.Join(Environment.NewLine, errors);
-            }
-
-            private sealed class ErrorModel
-            {
-                public string message { get; set; }
-                public List<object> path { get; set; }
-                public List<ErrorLocation> locations { get; set; }
-
-                public override string ToString()
-                {
-                    return $"{message} [{string.Join(", ", locations)}] {string.Join("/", path)}";
-                }
-            }
-
-            private sealed class ErrorLocation
-            {
-                public int line { get; set; }
-                public int column { get; set; }
-
-                public override string ToString()
-                {
-                    return $"ln: {line}, col: {column}";
-                }
-            }
-        }
+            T DeserializeResponse<T>(string response, JsonSerializerOptions serializerOptions);
+        }        
     }
 }

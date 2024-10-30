@@ -9,7 +9,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ArgumentPassedAsNameValue()
         {
-            var query = QueryMapper.MapQuery<OrdersQuery>(o => o.Orders.Argument("orderNr", "1234").Argument("country", "cz")
+            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument("orderNr", "1234").Argument("country", "cz")
                                 
                 .With(o => o.Customer.Argument("e-mail", "*@gmail.com"), o => o.Products)
                 );
@@ -41,7 +41,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ArgumentPassedAsVariablePass()
         {
-            var query = QueryMapper.MapQuery<OrdersQuery>(o => o.Orders.Argument("orderNr", QueryVariable.Pass<string>("$v1")).With(o => o.Customer, o => o.Products));
+            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument("orderNr", QueryVariable.Pass<string>("$v1")).With(o => o.Customer, o => o.Products));
 
             var ordersNode = query.FindChild("Orders");
             ordersNode.Should().NotBeNull();
@@ -57,7 +57,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ArgumentsPassedAsObject()
         {
-            var query = QueryMapper.MapQuery<OrdersQuery>(o => o.Orders.Argument(new { orderNr = "1234", country = "cz"})
+            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument(new { orderNr = "1234", country = "cz"})
 
                 .With(o => o.Customer.Argument(new { email = QueryVariable.GetVariableNameRenderer("$v1") }), o => o.Products)
                 );
@@ -88,7 +88,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void ArgumentsPassedAsDictionary()
         {
-            var query = QueryMapper.MapQuery<OrdersQuery>(o => o.Orders.Argument(new Dictionary<string, object> { { "orderNr", "1234" }, { "country", "cz" } })
+            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument(new Dictionary<string, object> { { "orderNr", "1234" }, { "country", "cz" } })
 
                 .With(o => o.Customer.Argument(new Dictionary<string, object> { { "email", QueryVariable.GetVariableNameRenderer("$v1") } }), o => o.Products)
                 );

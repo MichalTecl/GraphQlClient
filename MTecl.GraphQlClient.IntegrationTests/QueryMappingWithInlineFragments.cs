@@ -13,7 +13,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
         [Fact]
         public void TypeCompositionsMappedAsFragments()
         {
-            var query = QueryMapper.MapQuery<ILocosQuery>(q => q.GetLocomotives());
+            var query = QueryMapper.MapQuery<ILocosQuery, IEnumerable<Locomotive>>(q => q.GetLocomotives());
 
             query.Should().NotBeNull();
 

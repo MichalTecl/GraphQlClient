@@ -38,7 +38,7 @@ namespace MTecl.GraphQlClient.ObjectMapping
         private static readonly DefaultMethodVisitor _defaultVisitor = new DefaultMethodVisitor();
         private static readonly ConcurrentDictionary<MethodInfo, IMethodVisitor> _visitorCache = new ConcurrentDictionary<MethodInfo, IMethodVisitor>();
        
-        public static QueryNode<TQuery> MapQuery<TQuery>(Expression<Func<TQuery, object>> expression)
+        public static QueryNode<TQuery> MapQuery<TQuery, TResult>(Expression<Func<TQuery, TResult>> expression)
         {
             var node = new QueryNode<TQuery>();
 
