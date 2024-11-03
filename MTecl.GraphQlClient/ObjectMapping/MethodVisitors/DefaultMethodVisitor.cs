@@ -30,33 +30,21 @@ namespace MTecl.GraphQlClient.ObjectMapping.Visitors
             {
                 var methodArgument = methodArguments[paramIndex];
 
-                var value = ResolveArgumentValue(mce.Arguments[paramIndex]);
+                var value = ResolveArgumentValue(parent, mce.Arguments[paramIndex]);
                 methodNode.Arguments.Add(new KeyValuePair<string, object>(methodArgument.Attribute.Name, value));
             }
 
             return methodNode;
         }
 
-        internal static object ResolveArgumentValue(Expression expression)
+        internal static object ResolveArgumentValue(INode parent, Expression expression)
         {
             if (expression is UnaryExpression unr && unr.NodeType == ExpressionType.Convert)
-                return ResolveArgumentValue(unr.Operand);
-
-            if (expression is MemberExpression mex && QueryVariable.IsValueProperty(mex.Member))
-            {
-                var owner = ExpressionTreeHelper.EvaluateExpression(mex.Expression) as QueryVariable;
-                if (owner != null)
-                    return owner.RenderToQuery();
-            }
-
+                return ResolveArgumentValue(parent, unr.Operand);
+                        
             else if (expression is MethodCallExpression mce && QueryVariable.IsPassMethod(mce.Method))
             {
-                var objValue = ResolveArgumentValue(mce.Arguments[0]);
-                var varNameStr = objValue as string;
-                if (string.IsNullOrEmpty(varNameStr))
-                    return objValue;
-
-                return QueryVariable.GetVariableNameRenderer(varNameStr);
+                return QueryVariable.ProcessPassCall(parent, mce);
             }
 
             return ExpressionTreeHelper.EvaluateExpression(expression);

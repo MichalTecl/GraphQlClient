@@ -21,5 +21,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
 
         public bool ConvertFieldNamesToCamelCase { get; set; } = true;
+
+        public IInputObjectSerializer InputObjectSerializer { get; set; } = GqlObjectSerializer.Instance;
     }
 }

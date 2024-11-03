@@ -13,26 +13,7 @@ using System.Reflection;
 namespace MTecl.GraphQlClient.ObjectMapping
 {
     internal static class QueryMapper
-    {
-        private static readonly HashSet<Type> _primitiveTypes = new HashSet<Type>
-        {
-            typeof(string),
-            typeof(int),
-            typeof(float),
-            typeof(double),
-            typeof(decimal),
-            typeof(bool),
-            typeof(char),
-            typeof(byte),
-            typeof(sbyte),
-            typeof(short),
-            typeof(ushort),
-            typeof(uint),
-            typeof(long),
-            typeof(ulong),
-            typeof(DateTime)    
-        };
-
+    {        
         private static readonly string[] _nulItemArray = new string[] { null };
 
         private static readonly DefaultMethodVisitor _defaultVisitor = new DefaultMethodVisitor();
@@ -178,7 +159,7 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
         private static bool IsComplexType(Type t)
         {
-            return !_primitiveTypes.Contains(t);
+            return !ClrGqlTypeMap.TypeMap.ContainsKey(t);
         }
     }
 }

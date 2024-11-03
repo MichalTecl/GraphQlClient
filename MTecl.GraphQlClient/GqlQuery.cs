@@ -1,4 +1,5 @@
-﻿using MTecl.GraphQlClient.ObjectMapping;
+﻿using MTecl.GraphQlClient.Execution;
+using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -13,45 +15,15 @@ using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient
 {
-    public class GqlQuery<TResult>
+    public class GqlQuery<TResult> : IExecutionData<TResult>
     {
         private readonly string _queryBody;
-        
+
         private GqlQuery(string query)
         {
             _queryBody = query;
         }
-
-        public async Task<TResult> ExecuteAsync(HttpClient httpClient, GqlRequestOptions options = null, CancellationToken ct = default)
-        {
-            options = options ?? new GqlRequestOptions();
-
-            var uri = options.RequestUri ?? httpClient.BaseAddress ?? throw new ArgumentException($"Both {nameof(options)}.{nameof(options.RequestUri)} and {nameof(httpClient)}.{nameof(httpClient.BaseAddress)} are null");
-
-            string responseString = null;
-            using (var httpRequestMessage = options.RequestMessageBuilder.CreateHttpRequestMessage(uri, options.CustomRequestHeaders, _queryBody, options.Encoding))
-            {
-                options.RawRequestPeek(_queryBody);
-
-                using (var response = await httpClient.SendAsync(httpRequestMessage, ct))
-                {
-                    try
-                    {
-                        responseString = await response.Content.ReadAsStringAsync();
-                        options.RawResponsePeek(responseString);
-                    }
-                    catch {; }
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw options.CreateResponseException(response, responseString);
-                    }
-                }
-            }
-
-            return options.ResponseDeserializer.DeserializeResponse<TResult>(responseString, options.JsonSerializerOptions);
-        }
-
+        
         public static GqlQuery<TResult> Build<TQueryType>(Expression<Func<TQueryType, TResult>> expression, GqlCompilerOptions options = null)
         {
             options = options ?? GqlCompilerOptions.Default;
@@ -67,14 +39,20 @@ namespace MTecl.GraphQlClient
             if (options.CustomizeQueryText != null)
                 query = options.CustomizeQueryText(query);
 
-            var serialized = options.Serializer.SerializeRequestBody(query);
-
             return new GqlQuery<TResult>(query);
         }
 
         public override string ToString()
         {
             return _queryBody;
-        }        
+        }
+
+        #region IExecutionData
+        public GqlRequestOptions Options { get; } = new GqlRequestOptions();
+
+        public string QueryBody => _queryBody;
+
+        public Dictionary<string, object> Variables { get; } = new Dictionary<string, object>(0);
+        #endregion
     }
 }

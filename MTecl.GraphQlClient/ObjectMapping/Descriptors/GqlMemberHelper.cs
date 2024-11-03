@@ -1,4 +1,5 @@
-﻿using MTecl.GraphQlClient.Utils;
+﻿using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
+using MTecl.GraphQlClient.Utils;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -76,6 +77,19 @@ namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
                 return type.GetElementType();
             
             return type;
+        }
+
+        internal static string ObtainGqlTypeName(Type type)
+        {
+            var glt = Attribute.GetCustomAttributes(type, true).OfType<IGraphQlType>().FirstOrDefault();
+
+            if (glt != null)
+                return glt.TypeName;
+
+            if (ClrGqlTypeMap.TypeMap.TryGetValue(type, out var gqlType))
+                return gqlType;
+
+            throw new ArgumentException($"It is not possible to obtain GraphQL type name for type '{type.Name}'. Please specify the type name in {nameof(QueryVariable.Pass)} method call");
         }
 
         public sealed class MappedMemberInfo

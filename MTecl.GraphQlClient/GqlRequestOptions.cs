@@ -1,4 +1,5 @@
 ﻿using MTecl.GraphQlClient.Exceptions;
+using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ using System.Text.Json;
 namespace MTecl.GraphQlClient
 {
     public class GqlRequestOptions
-    {
-        public Dictionary<string, string> CustomRequestHeaders { get; } = new Dictionary<string, string>() { { "accept", "application/json" } };
+    {       
+        public RequestHeaders CustomRequestHeaders { get; } = new RequestHeaders().Set("accept", "application/json");
 
         public Uri RequestUri { get; set; }
 
@@ -30,7 +31,13 @@ namespace MTecl.GraphQlClient
             HttpRequestMessage CreateHttpRequestMessage(Uri uri, Dictionary<string, string> headers, string body, Encoding encoding);
         }
 
-        public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions();
+        public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions()
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,            
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+                
+        public RenderOptions RenderOptions { get; set; } = RenderOptions.Default;
 
         private sealed class DefaultRequestMessageBuilder : IRequestMessageBuilder
         {
@@ -42,7 +49,7 @@ namespace MTecl.GraphQlClient
                 {
                     RequestUri = uri,
                     Method = HttpMethod.Post,
-                    Content = new StringContent(body, encoding)
+                    Content = new StringContent(body, encoding, "application/json")
                 };
 
                 foreach (var h in headers)
@@ -58,5 +65,14 @@ namespace MTecl.GraphQlClient
         {
             T DeserializeResponse<T>(string response, JsonSerializerOptions serializerOptions);
         }        
+
+        public sealed class RequestHeaders : Dictionary<string, string>
+        {
+            public RequestHeaders Set(string key, string value)
+            {
+                this[key] = value;
+                return this;
+            }
+        }
     }
 }

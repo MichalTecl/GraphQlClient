@@ -23,74 +23,21 @@ namespace MTecl.GraphQlClient.Utils
             return compiledLambda.DynamicInvoke();
         }        
 
-        public static bool TryGetMethodArguments<T1>(this MethodCallExpression mce, out T1 arg1)
+        public static T TryGetArgument<T>(MethodCallExpression mce, string argumentName, Func<T> getDefaultValue)
         {
-            if (TryEvalArguments(mce, out var args, typeof(T1)))
+            var methodParams = mce.Method.GetParameters();
+
+            for(var i = 0; i < methodParams.Length; i++)
             {
-                arg1 = (T1)args[0];
-                return true;
-            }
-
-            arg1 = default;
-            return false;
-        }
-
-        public static bool TryGetMethodArguments<T1, T2>(this MethodCallExpression mce, out T1 arg1, out T2 arg2)
-        {
-            if (TryEvalArguments(mce, out var args, typeof(T1), typeof(T2)))
-            {
-                arg1 = (T1)args[0];
-                arg2 = (T2)args[1];
-                return true;
-            }
-
-            arg1 = default;
-            arg2 = default;
-            return false;
-        }
-
-        public static bool TryGetMethodArguments<T1, T2, T3>(this MethodCallExpression mce, out T1 arg1, out T2 arg2, out T3 arg3)
-        {
-            if (TryEvalArguments(mce, out var args, typeof(T1), typeof(T2), typeof(T3)))
-            {
-                arg1 = (T1)args[0];
-                arg2 = (T2)args[1];
-                arg3 = (T3)args[2];
-                return true;
-            }
-
-            arg1 = default;
-            arg2 = default;
-            arg3 = default;
-            return false;
-        }
-
-        private static bool TryEvalArguments(MethodCallExpression mce, out object[] args, params Type[] t)
-        {
-            args = new object[t.Length];
-
-            if (t.Length != mce.Arguments.Count)
-                return false;
-
-            for(var i = 0; i < t.Length; i++)
-            {
-                var evaluated = EvaluateExpression(mce.Arguments[i]);
-                if (evaluated == null)
+                if (methodParams[i].Name == argumentName && typeof(T).IsAssignableFrom(methodParams[i].ParameterType))
                 {
-                    if (t[i].IsValueType)
-                        return false;
-                    args[i] = null;
-                    continue;
+                    return (T)EvaluateExpression(mce.Arguments[i]);
                 }
-
-                if (!t[i].IsAssignableFrom(evaluated.GetType()))
-                    return false;
-
-                args[i] = evaluated;
             }
 
-            return true;
+            return getDefaultValue();
         }
+       
 
     }
 }

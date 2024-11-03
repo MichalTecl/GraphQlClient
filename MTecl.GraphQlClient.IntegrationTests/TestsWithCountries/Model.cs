@@ -60,7 +60,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 
     }
 
-    public interface Query
+    public interface IQuery
     {
         [Gql("continent")]
         Continent GetContinent(string code);

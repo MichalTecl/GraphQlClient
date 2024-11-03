@@ -31,13 +31,13 @@ namespace MTecl.GraphQlClient.ObjectMapping.MethodVisitors
             if (arguments.Length == 2)
             {
                 var argName = ExpressionTreeHelper.EvaluateExpression(arguments[0]) as string;
-                var argValue = DefaultMethodVisitor.ResolveArgumentValue(arguments[1]);
+                var argValue = DefaultMethodVisitor.ResolveArgumentValue(target, arguments[1]);
 
                 target.Arguments.Add(new KeyValuePair<string, object>(argName, argValue));
             }
             else if (arguments.Length == 1)
             {
-                var argsModel = DefaultMethodVisitor.ResolveArgumentValue(arguments[0]);
+                var argsModel = DefaultMethodVisitor.ResolveArgumentValue(target, arguments[0]);
 
                 if (argsModel is IDictionary dictionary)
                 {
