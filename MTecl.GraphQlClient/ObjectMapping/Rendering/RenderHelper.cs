@@ -76,7 +76,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
             }
             else
             {
-                _sb.Append(JsonSerializer.Serialize(value, _renderOptions.JsonSerializerOptions ?? new JsonSerializerOptions()));
+                _sb.Append(_renderOptions.InputObjectSerializer.Serialize(value));                
             }
             
             return this;

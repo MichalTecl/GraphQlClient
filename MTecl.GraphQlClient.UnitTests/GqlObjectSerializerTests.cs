@@ -4,7 +4,7 @@ namespace MTecl.GraphQlClient.UnitTests
 {
     public class GqlObjectSerializerTests
     {
-        private readonly GqlObjectSerializer _sut = new GqlObjectSerializer();
+        private readonly GqlObjectSerializer _sut = new GqlObjectSerializer(RenderOptions.Default);
 
         [Fact]
         public void Serialize_ShouldConvertSimpleObjectToGraphQLInput()
@@ -60,24 +60,7 @@ namespace MTecl.GraphQlClient.UnitTests
             // Assert
             Assert.Equal("{ items: [ \"apple\", \"banana\", \"cherry\" ] }", result);
         }
-
-        [Fact]
-        public void Serialize_ShouldHandleNullValues()
-        {
-            // Arrange
-            var obj = new
-            {
-                name = (string)null,
-                age = 30
-            };
-
-            // Act
-            string result = _sut.Serialize(obj);
-
-            // Assert
-            Assert.Equal("{ name: null, age: 30 }", result);
-        }
-
+                
         [Fact]
         public void Serialize_ShouldHandleEmptyObject()
         {
@@ -113,6 +96,25 @@ namespace MTecl.GraphQlClient.UnitTests
 
             // Assert
             Assert.Equal("{ name: \"Alice\", age: 28, isMember: true, address: { street: \"456 Maple Rd\", city: \"Los Angeles\" } }", result);
+        }
+
+        [Fact]
+        public void Serialize_ShouldSkipNullProperties()
+        {
+            // Arrange
+            var obj = new
+            {
+                name = "Alice",
+                age = (int?)null,
+                isMember = true,
+                address = (string)null
+            };
+
+            // Act
+            string result = _sut.Serialize(obj);
+
+            // Assert
+            Assert.Equal("{ name: \"Alice\", isMember: true }", result);
         }
     }
 }

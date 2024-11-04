@@ -48,6 +48,15 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
             northAmerica.Should().NotBeNull();
             northAmerica.code.Should().Be("NA");
         }
+
+        [Fact]
+        public async Task QueryWithHardcodedInputType()
+        {
+            var czAndJp = await Execute(Queries.CzechAndJapanQuery);
+
+            czAndJp.Should().NotBeNull();
+            czAndJp.Should().HaveCount(2);
+        }
         
         private static async Task<T> Execute<T>(IExecutionData<T> query)
         {

@@ -8,11 +8,16 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
 {
     internal class GqlObjectSerializer : IInputObjectSerializer
     {
-        public static readonly GqlObjectSerializer Instance = new GqlObjectSerializer();
+        private readonly RenderOptions _renderOptions;
+
+        public GqlObjectSerializer(RenderOptions renderOptions)
+        {
+            _renderOptions = renderOptions;
+        }
 
         public string Serialize(object o)
         {
-            var jDocument = JsonSerializer.SerializeToDocument(o);
+            var jDocument = JsonSerializer.SerializeToDocument(o, _renderOptions.JsonSerializerOptions);
 
             return SerializeNode(jDocument.RootElement);
         }

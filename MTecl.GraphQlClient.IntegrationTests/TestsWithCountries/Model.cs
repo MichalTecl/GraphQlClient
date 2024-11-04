@@ -57,7 +57,28 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 
     public class StringFilterInput
     {
+        public string eq { get; set; }
 
+        [Gql("in")]
+        public List<string> @in { get; set; }
+
+        public List<string> nin { get; set; }
+
+        public string ne { get; set; }
+
+        public string regex { get; set; }
+    }
+
+    [GqlType("CountryFilterInput")]
+    public class CountryFilter 
+    {
+        public StringFilterInput code { get; set; }
+
+        public StringFilterInput continent { get; set; }
+
+        public StringFilterInput currency { get; set; }
+
+        public StringFilterInput name { get; set; }
     }
 
     public interface IQuery
@@ -67,6 +88,9 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 
         [Gql("continents")]
         List<Continent> Continents(StringFilterInput filter);
+
+        [Gql("countries")]
+        List<Country> GetCountries(CountryFilter filter);
     }
 
     public class ContinentResponse { public Continent Continent { get; set; } }

@@ -12,5 +12,8 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         public static readonly GqlQuery<Continent> EuropeQuery = GqlQuery<Continent>.Build<IQuery>(q => q.GetContinent("EU"));
 
         public static readonly GqlQuery<Continent> ContinentByCodeQuery = GqlQuery<Continent>.Build<IQuery>(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID")));
+
+        public static readonly GqlQuery<List<Country>> CzechAndJapanQuery = GqlQuery<List<Country>>.Build<IQuery>(q => q
+            .GetCountries(new CountryFilter { code = new StringFilterInput { @in = new List<string>() { "CZ", "JP" } } }));
     }
 }

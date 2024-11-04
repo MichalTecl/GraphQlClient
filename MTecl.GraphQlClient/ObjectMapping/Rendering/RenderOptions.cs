@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering
@@ -14,14 +15,22 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
                 PropertyNameCaseInsensitive = true,
                 AllowTrailingCommas = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            },
+
+            
         };
+
+        public RenderOptions()
+        {
+            InputObjectSerializer = new GqlObjectSerializer(this);
+        }
 
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
 
         public bool ConvertFieldNamesToCamelCase { get; set; } = true;
 
-        public IInputObjectSerializer InputObjectSerializer { get; set; } = GqlObjectSerializer.Instance;
+        public IInputObjectSerializer InputObjectSerializer { get; set; }
     }
 }

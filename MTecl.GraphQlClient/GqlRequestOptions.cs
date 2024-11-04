@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace MTecl.GraphQlClient
@@ -34,7 +35,8 @@ namespace MTecl.GraphQlClient
         public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions()
         {
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,            
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
                 
         public RenderOptions RenderOptions { get; set; } = RenderOptions.Default;
