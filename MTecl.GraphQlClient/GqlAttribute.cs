@@ -18,6 +18,9 @@ namespace MTecl.GraphQlClient
         }
                 
         public string Name { get; set; }
+
+        public string IsAliasFor { get; set; }
+
         public FieldInclusionMode InclusionMode { get; set; }
 
         public T CloneWithDefaults<T>(T source, object member) where T : IGqlMember
@@ -33,7 +36,7 @@ namespace MTecl.GraphQlClient
             else
                 throw new ArgumentException($"Unexpected member {member?.GetType()}");
 
-            return (T)(object)new GqlAttribute { InclusionMode = source.InclusionMode, Name = memberName };
+            return (T)(object)new GqlAttribute { InclusionMode = source.InclusionMode, Name = memberName, IsAliasFor = source.IsAliasFor };
         }
     }
 }

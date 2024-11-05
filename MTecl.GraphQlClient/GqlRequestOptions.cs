@@ -36,7 +36,8 @@ namespace MTecl.GraphQlClient
         {
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,            
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters = { new CustomDateTimeConverter("yyyy-MM-dd HH:mm:ss") }
         };
                 
         public RenderOptions RenderOptions { get; set; } = RenderOptions.Default;

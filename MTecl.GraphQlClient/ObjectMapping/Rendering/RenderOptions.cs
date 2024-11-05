@@ -16,7 +16,8 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
                 PropertyNameCaseInsensitive = true,
                 AllowTrailingCommas = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Converters = { new CustomDateTimeConverter("yyyy-MM-dd HH:mm:ss") }
             },
 
             

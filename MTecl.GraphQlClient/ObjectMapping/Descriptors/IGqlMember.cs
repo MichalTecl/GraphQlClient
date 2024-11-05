@@ -9,6 +9,8 @@ namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
         FieldInclusionMode InclusionMode { get; set; }
 
         string Name { get; }
+
+        string IsAliasFor { get; }
                 
         T CloneWithDefaults<T>(T source, object member) where T : IGqlMember;
     }

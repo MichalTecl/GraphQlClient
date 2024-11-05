@@ -21,6 +21,9 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             query.Field("GetLocomotives").Fragment("DIESEL").Field("TankCapacity").Should().NotBeNull();
             query.Field("GetLocomotives").Fragment("ELECTRIC").Field("Voltage").Should().NotBeNull();
+
+            query.Field("GetLocomotives").Fragment("DIESEL").Field("MaxSpeed").Should().NotBeNull();
+            query.Field("GetLocomotives").Fragment("ELECTRIC").Field("MaxSpeed").Should().NotBeNull();
         }
 
         
@@ -31,14 +34,18 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
         [GqlTypeFragment("DIESEL")]
         interface IDieselLoco
-        {
+        {            
             int TankCapacity { get; set; }
+
+            int MaxSpeed { get; set; }
         }
 
         [GqlTypeFragment("ELECTRIC")]
         interface IElectricLoco 
         {
             int Voltage { get; set; }
+
+            int MaxSpeed { get; set; }
         }
 
         class Locomotive : IElectricLoco, IDieselLoco
@@ -46,6 +53,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
             public int Voltage { get; set; }
             public int TankCapacity { get; set; }
             public string Name { get; set; }
+            public int MaxSpeed { get; set; }
         }
     }
 }

@@ -107,7 +107,8 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
             var memberNode = new FieldNode
             {
-                Name = memberInfo.Attribute.Name
+                Name = memberInfo.Attribute.Name,
+                IsAliasFor = memberInfo.Attribute.IsAliasFor
             };
 
             if (topNodeOnly || !IsComplexType(memberType))
@@ -144,7 +145,8 @@ namespace MTecl.GraphQlClient.ObjectMapping
                     {
                         targetNode.Nodes.Add(new FieldNode
                         {
-                            Name = field.Attribute.Name
+                            Name = field.Attribute.Name,
+                            IsAliasFor = field.Attribute.IsAliasFor
                         });
                     }
                     else

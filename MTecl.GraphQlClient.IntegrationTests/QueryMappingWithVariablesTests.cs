@@ -25,9 +25,19 @@ namespace MTecl.GraphQlClient.IntegrationTests
             rendered.Should().Contain("(namePattern: $v1, needsWatering: $v2)");
         }
 
+        [Fact]
+        public void TestTwoUsagesOfSameVar()
+        {
+            var query = QueryMapper.MapQuery<IFlowerQuery, Flower>(f => f.FindFlower(QueryVariable.Pass<int>("$color"), QueryVariable.Pass<int>("$color")));
+
+            query.QueryVariables.Count.Should().Be(1);
+        }
+
         interface IFlowerQuery
         {
             IEnumerable<Flower> GetFlowers(string namePattern, bool? needsWatering);
+
+            Flower FindFlower(int summerColor, int winterColor);
         }
 
         class Flower

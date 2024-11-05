@@ -46,8 +46,8 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             var usersNode = query.FindChild("Users");
             usersNode.Should().NotBeNull();
-
-            usersNode.Nodes.Filtered.Should().HaveCount(3);
+                        
+            usersNode.Nodes.Filtered.Should().HaveCount(4);
 
             var bigPp = usersNode.FindChild("BigProfilePicture");
             bigPp.Should().NotBeNull();
@@ -66,11 +66,29 @@ namespace MTecl.GraphQlClient.IntegrationTests
             rendered.Should().ContainAll("bigProfilePicture: ProfilePicture(size: 1024)", "smallProfilePicture: ProfilePicture(size: 64)");
         }
 
+        [Fact]
+        public void AliasCouldBeAssignedByAttribute()
+        {
+            var query = QueryMapper.MapQuery<UsersQuery, List<User>>(u => u.Users.With());
+
+            var usersNode = query.FindChild("Users");
+            usersNode.Should().NotBeNull();
+
+            var userNameNode = usersNode.FindChild("UserName");
+            userNameNode.Should().NotBeNull();
+            userNameNode.IsAliasFor.Should().Be("email");
+
+            var rendered = query.ToString();
+        }
+
         class User
         {
             public string Id { get; set; }
             public Picture BigProfilePicture { get; set; }
             public Picture SmallProfilePicture { get; set; }
+
+            [Gql(IsAliasFor = "email")]
+            public string UserName { get; set; }
         }
 
         class UsersQuery
