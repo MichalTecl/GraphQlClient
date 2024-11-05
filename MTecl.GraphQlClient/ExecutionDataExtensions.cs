@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,32 +11,36 @@ namespace MTecl.GraphQlClient
 {
     public static  class ExecutionDataExtensions
     {
-        public static async Task<TResult> ExecuteAsync<TResult>(this IExecutionData<TResult> ed, HttpClient httpClient, CancellationToken cancellationToken = default)
+        public static async Task<TResult> ExecuteAsync<TResult>(this IQuery<TResult> d, HttpClient httpClient, CancellationToken cancellationToken = default)
         {
-            return await QueryExecutor.ExecuteAsync<TResult>(ed, httpClient, cancellationToken);
+            return await QueryExecutor.ExecuteAsync<TResult>(d, httpClient, cancellationToken);
         }
 
-        public static IExecutionData<TResult> WithOptions<TResult>(this IExecutionData<TResult> ed, GqlRequestOptions options)
+        public static IQuery<TResult> WithOptions<TResult>(this IQuery<TResult> ed, GqlRequestOptions options)
         {
-            return new ExData<TResult>(ed.QueryBody, ed.Variables, options);
+            return new QData<TResult>(ed) { Options = options };
         }
 
-        public static IExecutionData<TResult> WithVariable<TResult>(this IExecutionData<TResult> d, string name, object value)
+        public static IQuery<TResult> WithVariable<TResult>(this IQuery<TResult> d, string name, object value)
         {            
             var target = Merge(d.Variables, null);
             target[SanitizeVarName(name)] = value;
 
-            return new ExData<TResult>(d.QueryBody, target, d.Options);
+            return new QData<TResult>(d) { Variables = target };
         }
 
-        public static IExecutionData<TResult> WithVariables<TResult>(this IExecutionData<TResult> d, IDictionary<string, object> variables)
+        public static IQuery<TResult> WithVariables<TResult>(this IQuery<TResult> d, IDictionary<string, object> variables)
         {
             var target = Merge(d.Variables, variables?.ToDictionary(dc => SanitizeVarName(dc.Key), dc => dc.Value));
             
-            return new ExData<TResult>(d.QueryBody, target, d.Options);
+            return new QData<TResult>(d) { Variables = target };
         }
 
-        public static IExecutionData<TResult> WithVariables<TResult>(this IExecutionData<TResult> d, object variables)
+        public static IQuery<TResult> Named<TResult>(this IQuery<TResult> d, string queryName) => new QData<TResult>(d) { QueryName = queryName };
+
+
+
+        public static IQuery<TResult> WithVariables<TResult>(this IQuery<TResult> d, object variables)
         {
             if (variables == null)
                 return d;
@@ -74,20 +76,23 @@ namespace MTecl.GraphQlClient
             return name;
         }
 
-        private sealed class ExData<TResult> : IExecutionData<TResult>
+        private sealed class QData<TResult> : IQuery<TResult>
         {
-            public ExData(string queryBody, Dictionary<string, object> variables, GqlRequestOptions options)
+            public QData(IQuery<TResult> src)
             {
-                QueryBody = queryBody;
-                Variables = variables;
-                Options = options;
+                QueryBody = src.QueryBody;
+                Variables = src.Variables;
+                Options = src.Options;
+                QueryName = src.QueryName;
             }
 
-            public string QueryBody { get; }
+            public string QueryName { get; set; }
 
-            public Dictionary<string, object> Variables { get; }
+            public string QueryBody { get; set; }
 
-            public GqlRequestOptions Options { get; }
+            public Dictionary<string, object> Variables { get; set; }
+
+            public GqlRequestOptions Options { get; set; }
         }
     }
 }

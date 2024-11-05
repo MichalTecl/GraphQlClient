@@ -89,7 +89,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
             if (ClrGqlTypeMap.TypeMap.TryGetValue(type, out var gqlType))
                 return gqlType;
 
-            throw new ArgumentException($"It is not possible to obtain GraphQL type name for type '{type.Name}'. Please specify the type name in {nameof(QueryVariable.Pass)} method call");
+            return type.Name;
         }
 
         public sealed class MappedMemberInfo

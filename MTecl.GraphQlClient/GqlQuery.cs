@@ -1,21 +1,13 @@
 ﻿using MTecl.GraphQlClient.Execution;
 using MTecl.GraphQlClient.ObjectMapping;
-using MTecl.GraphQlClient.ObjectMapping.GraphModel;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient
 {
-    public class GqlQuery<TResult> : IExecutionData<TResult>
+    public class GqlQuery<TResult> : IQuery<TResult>
     {
         private readonly string _queryBody;
 
@@ -24,7 +16,12 @@ namespace MTecl.GraphQlClient
             _queryBody = query;
         }
         
-        public static GqlQuery<TResult> Build<TQueryType>(Expression<Func<TQueryType, TResult>> expression, GqlCompilerOptions options = null)
+        public static IQuery<TResult> Build<TQueryType>(string queryName, Expression<Func<TQueryType, TResult>> expression, GqlCompilerOptions options = null)
+        {
+            return Build(expression, options).Named(queryName);
+        }
+
+        public static IQuery<TResult> Build<TQueryType>(Expression<Func<TQueryType, TResult>> expression, GqlCompilerOptions options = null)
         {
             options = options ?? GqlCompilerOptions.Default;
 
@@ -47,12 +44,14 @@ namespace MTecl.GraphQlClient
             return _queryBody;
         }
 
-        #region IExecutionData
+        #region IQuery
         public GqlRequestOptions Options { get; } = new GqlRequestOptions();
 
         public string QueryBody => _queryBody;
 
         public Dictionary<string, object> Variables { get; } = new Dictionary<string, object>(0);
+
+        public string QueryName => null;
         #endregion
     }
 }
