@@ -6,7 +6,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
 {
     public interface IGqlMember
     {
-        FieldInclusionMode InclusionMode { get; set; }
+        FieldInclusionMode InclusionMode { get; }
 
         string Name { get; }
 

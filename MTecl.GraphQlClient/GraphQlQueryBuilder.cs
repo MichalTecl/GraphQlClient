@@ -26,11 +26,11 @@ namespace MTecl.GraphQlClient
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };                       
+            };
 
             JsonSerializerOptions.Converters.Add(new DateTimeConverter(this));
             JsonSerializerOptions.Converters.Add(new EnumValueConverter(false));
-
+            
             InputObjectSerializer = new GqlObjectSerializer(this);
         }
 
