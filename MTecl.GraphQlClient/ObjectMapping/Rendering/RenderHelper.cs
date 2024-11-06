@@ -11,19 +11,19 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
     {
         private readonly StringBuilder _sb;
         private int _lastIndent = 0;
-        private readonly RenderOptions _renderOptions;
+        private readonly GraphQlQueryBuilder _builder;
 
-        public RenderHelper(StringBuilder sb, RenderOptions renderOptions)
+        public RenderHelper(StringBuilder sb, GraphQlQueryBuilder builder)
         {
             _sb = sb;
-            _renderOptions = renderOptions;
+            _builder = builder;
         }
 
-        public RenderHelper(RenderOptions renderOptions) : this(new StringBuilder(), renderOptions) {}
+        public RenderHelper(GraphQlQueryBuilder builder) : this(new StringBuilder(), builder) {}
 
         public StringBuilder StringBuilder => _sb;
 
-        public RenderOptions RenderOptions => _renderOptions;
+        public GraphQlQueryBuilder Builder => _builder;
 
         public RenderHelper Indent(int level)
         {
@@ -76,7 +76,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
             }
             else
             {
-                _sb.Append(_renderOptions.InputObjectSerializer.Serialize(value));                
+                _sb.Append(_builder.InputObjectSerializer.Serialize(value));                
             }
             
             return this;

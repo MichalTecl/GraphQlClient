@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient
 {
-    public static  class ExecutionDataExtensions
+    public static  class QueryExtensions
     {
         public static async Task<TResult> ExecuteAsync<TResult>(this IQuery<TResult> d, HttpClient httpClient, CancellationToken cancellationToken = default)
         {
@@ -84,6 +84,7 @@ namespace MTecl.GraphQlClient
                 Variables = src.Variables;
                 Options = src.Options;
                 QueryName = src.QueryName;
+                Builder = src.Builder;
             }
 
             public string QueryName { get; set; }
@@ -93,6 +94,8 @@ namespace MTecl.GraphQlClient
             public Dictionary<string, object> Variables { get; set; }
 
             public GqlRequestOptions Options { get; set; }
+
+            public GraphQlQueryBuilder Builder { get; }
         }
     }
 }

@@ -19,7 +19,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
             renderHelper
                 .Indent(Level).Literal("fragment ").Literal(Name).Literal(" on ").Literal(OnType).OpenCodeBlock();
                 
-            Nodes.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
+            Nodes.Render(renderHelper.StringBuilder, renderHelper.Builder);
 
             renderHelper.CloseCodeBlock();
         }

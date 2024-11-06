@@ -5,7 +5,7 @@ namespace MTecl.GraphQlClient.Utils
 {
     internal static class NamingConventionHelper
     {
-        public static string ConvertName(string name, RenderOptions options)
+        public static string ConvertName(string name, GraphQlQueryBuilder options)
         {
             if (options.ConvertFieldNamesToCamelCase)
                 name = CCase(name);

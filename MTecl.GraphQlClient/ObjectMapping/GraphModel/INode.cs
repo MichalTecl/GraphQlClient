@@ -13,7 +13,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
         INode Parent { get; set; }
         NodeCollection Nodes { get; }
         bool IsImportant { get; }
-        void Render(StringBuilder sb, RenderOptions renderOptions);
+        void Render(StringBuilder sb, GraphQlQueryBuilder builder);
         Expression Expression { get; set; }
     }
 }

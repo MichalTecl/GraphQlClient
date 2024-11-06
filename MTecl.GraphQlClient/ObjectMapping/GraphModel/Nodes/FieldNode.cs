@@ -24,11 +24,11 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
                         
             if (!string.IsNullOrEmpty(IsAliasFor))
             {            
-                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.RenderOptions)).Literal(": ").Literal(IsAliasFor);
+                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.Builder)).Literal(": ").Literal(IsAliasFor);
             }
             else
             {
-                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.RenderOptions));
+                renderHelper.Literal(NamingConventionHelper.ConvertName(Name, renderHelper.Builder));
             }
 
             if (Arguments.Count > 0) 
@@ -46,7 +46,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
             {
                 renderHelper.OpenCodeBlock();
                 foreach (var child in Nodes.Filtered)
-                    child.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
+                    child.Render(renderHelper.StringBuilder, renderHelper.Builder);
                 renderHelper.Indent(Level).CloseCodeBlock();
             }
             else

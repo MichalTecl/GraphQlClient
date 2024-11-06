@@ -1,8 +1,11 @@
 ﻿using BwApiClient.Model.Data;
+using BwApiClient.Model.Enums;
 using BwApiClient.Model.Inputs;
 using MTecl.GraphQlClient;
 using MTecl.GraphQlClient.Execution;
+using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
+using MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -13,9 +16,21 @@ namespace BwApiClient
 {
     public class BwClient
     {
-        private static readonly IQuery<List<OrderStatus>> _orderStatusesQuery = GqlQuery<List<OrderStatus>>.Build<IQueries>(q => q.ListOrderStatuses(null, QueryVariable.Pass<bool>("$onlyactive")));
+        private readonly Func<HttpClient> _httpClientFactory;
+        private readonly GqlRequestOptions _options;
 
-        private static readonly IQuery<PaginatedList<Order>> _ordersChangedAfterQuery = GqlQuery<PaginatedList<Order>>.Build<IQueries>(
+        private static readonly GraphQlQueryBuilder<IQueries> _builder;
+
+        static BwClient()
+        {
+            _builder = new GraphQlQueryBuilder<IQueries>();
+            _builder.DateTimeConverter.Mode = DateTimeConverter.StringConversionMode("yyyy-MM-dd HH:mm:ss");
+        }
+        
+
+        private static readonly IQuery<List<OrderStatus>> _orderStatusesQuery = _builder.Build(q => q.ListOrderStatuses(null, QueryVariable.Pass<bool>("$onlyactive")));
+
+        private static readonly IQuery<PaginatedList<Order>> _ordersChangedAfterQuery = _builder.Build(
             q => q.GetOrderList(
                 /*lang_code:*/ null,
                 /*status:*/ null,
@@ -33,8 +48,7 @@ namespace BwApiClient
                                                       , o => o.items.With(i => i.product))
                                 ));
 
-        private readonly Func<HttpClient> _httpClientFactory;
-        private readonly GqlRequestOptions _options;
+        
 
         /// <summary>
         /// https://www.byznysweb.cz/a/1267/volani-api
@@ -66,9 +80,13 @@ namespace BwApiClient
             return await Execute(_orderStatusesQuery.WithVariable("$onlyactive", onlyActive));
         }
 
-        public async Task<PaginatedList<Order>> GetOrders(DateTime changedAfter, int? listOffset = 0) 
+        public async Task<PaginatedList<Order>> GetOrders(DateTime changedAfter, int? listOffset = 0, OrderSorting orderSorting = OrderSorting.last_change, Direction sortDirection = Direction.DESC) 
         {
-            var filter = new OrderParams { };
+            var filter = new OrderParams 
+            {
+                sort = sortDirection,
+                order_by = orderSorting,
+            };
 
             return await Execute(_ordersChangedAfterQuery
                                     .WithVariable("$changedAfter", changedAfter)

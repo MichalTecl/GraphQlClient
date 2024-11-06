@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BwApiClient", "BwApiClient\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{65FB1A4B-C9AB-4950-942C-13DECFEA6675}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Research_BWPlayground", "Research_BWPlayground", "{415C233F-51A3-45D4-BC2F-FF986F57765C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97615F53-AB27-40EC-A5EF-D12F2E5FCAE5} = {415C233F-51A3-45D4-BC2F-FF986F57765C}
+		{65FB1A4B-C9AB-4950-942C-13DECFEA6675} = {415C233F-51A3-45D4-BC2F-FF986F57765C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EB8ACAD-9FDB-4A77-8F25-B0B2E2D02773}

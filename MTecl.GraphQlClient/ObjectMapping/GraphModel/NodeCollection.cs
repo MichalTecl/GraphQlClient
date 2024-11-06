@@ -60,10 +60,10 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel
             return _nodes.Contains(item);
         }
 
-        public void Render(StringBuilder stringBuilder, RenderOptions renderOptions)
+        public void Render(StringBuilder stringBuilder, GraphQlQueryBuilder builder)
         {
             foreach (var n in _nodes)
-                n.Render(stringBuilder, renderOptions);
+                n.Render(stringBuilder, builder);
         }
 
         public IEnumerable<INode> Remove(Func<INode, bool> predicate)

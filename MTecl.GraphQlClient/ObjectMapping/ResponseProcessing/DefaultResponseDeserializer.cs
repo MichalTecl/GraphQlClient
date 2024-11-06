@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static MTecl.GraphQlClient.GqlRequestOptions;
+using static MTecl.GraphQlClient.Execution.GqlRequestOptions;
 
 namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
 {
@@ -13,7 +13,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
     {
         public static readonly DefaultResponseDeserializer Instance = new DefaultResponseDeserializer();
 
-        public T DeserializeResponse<T>(string response, JsonSerializerOptions options)
+        public T DeserializeResponse<T>(string response, GraphQlQueryBuilder builder)
         {
             var node = JsonNode.Parse(response);
                                     
@@ -44,7 +44,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
             if (valueNode.Key == null || valueNode.Value == null)
                 return default;
             
-            return valueNode.Value.Deserialize<T>(options);
+            return valueNode.Value.Deserialize<T>(builder.JsonSerializerOptions);
         }
 
         #region Model

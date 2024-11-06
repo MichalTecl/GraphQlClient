@@ -28,7 +28,7 @@ namespace MTecl.GraphQlClient.UnitTests
             public string NodeId { get; set; }
             public Expression Expression { get; set; }
 
-            public void Render(StringBuilder stringBuilder, RenderOptions o) => stringBuilder.Append($"Node{NodeId}");
+            public void Render(StringBuilder stringBuilder, GraphQlQueryBuilder o) => stringBuilder.Append($"Node{NodeId}");
         }
 
         [Fact]

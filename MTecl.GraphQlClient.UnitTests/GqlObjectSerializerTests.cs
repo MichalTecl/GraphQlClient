@@ -4,7 +4,7 @@ namespace MTecl.GraphQlClient.UnitTests
 {
     public class GqlObjectSerializerTests
     {
-        private readonly GqlObjectSerializer _sut = new GqlObjectSerializer(RenderOptions.Default);
+        private readonly GqlObjectSerializer _sut = new GqlObjectSerializer(GraphQlQueryBuilder.Create());
 
         [Fact]
         public void Serialize_ShouldConvertSimpleObjectToGraphQLInput()
@@ -115,6 +115,21 @@ namespace MTecl.GraphQlClient.UnitTests
 
             // Assert
             Assert.Equal("{ name: \"Alice\", isMember: true }", result);
+        }
+
+        [Fact]
+        public void Enum_ShouldBeSerializedAsValueName()
+        {
+            var obj = new { e = Enum1.ValueA, x = new { f = Enum1.ValueB }};
+            
+            var result = _sut.Serialize(obj);
+
+            Assert.Equal($"{{ e: {nameof(Enum1.ValueA)}, x: {{ f: {nameof(Enum1.ValueB)} }} }}", result);
+        }
+
+        public enum Enum1
+        {
+            ValueA, ValueB
         }
     }
 }

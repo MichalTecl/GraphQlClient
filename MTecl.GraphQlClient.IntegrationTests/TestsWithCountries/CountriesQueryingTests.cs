@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using MTecl.GraphQlClient.Execution;
+using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 {
     public class CountriesQueryingTests
     {
+        private static readonly GraphQlQueryBuilder<IQuery> _builder = new GraphQlQueryBuilder<IQuery>();
         private static readonly GqlRequestOptions _options; 
 
         static CountriesQueryingTests()
@@ -35,7 +37,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task SimpleQueryOneLevelWithoutVariables()
         {
-            var query = GqlQuery<Continent>.Build<IQuery>(q => q.GetContinent("EU"));
+            var query = _builder.Build(q => q.GetContinent("EU"));
 
             var eu = await Execute(query);
 
@@ -46,7 +48,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task QueryWithVariable()
         {
-            var query = GqlQuery<Continent>.Build<IQuery>(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID"))).WithVariable("code", "NA");
+            var query = _builder.Build(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID"))).WithVariable("code", "NA");
 
             var northAmerica = await Execute(query);
 
@@ -57,7 +59,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task QueryWithHardcodedInputType()
         {
-            var query = GqlQuery<List<Country>>.Build<IQuery>(q => q.GetCountries(new CountryFilter { code = new StringFilterInput { @in = new List<string>() { "CZ", "JP" } } }));
+            var query = _builder.Build(q => q.GetCountries(new CountryFilter { code = new StringFilterInput { @in = new List<string>() { "CZ", "JP" } } }));
 
             var czAndJp = await Execute(query);
 
@@ -68,7 +70,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task QueryWithPassedComplexVariable_TypeNameFromAttribute()
         {
-            var query = GqlQuery<List<Country>>.Build<IQuery>(q => q.GetCountries(QueryVariable.Pass<CountryFilter>("filter")))
+            var query = _builder.Build(q => q.GetCountries(QueryVariable.Pass<CountryFilter>("filter")))
                 .WithVariable("filter", new CountryFilter { code = new StringFilterInput { @in = ["CZ", "UA"] } });
 
             var czAndUa = await Execute(query);
@@ -80,7 +82,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task QueryWithPassedComplexVariable_TypeNameFromPassArgument()
         {
-            var query = GqlQuery<List<Language>>.Build<IQuery>(q => q.GetLanguages(QueryVariable.Pass<LanguageFilter>("filter", "LanguageFilterInput")))
+            var query = _builder.Build(q => q.GetLanguages(QueryVariable.Pass<LanguageFilter>("filter", "LanguageFilterInput")))
                 .WithVariable("filter", new LanguageFilter { code = new StringFilterInput { @in = ["en", "de"] } });
 
             var enAndDe = await Execute(query);
@@ -92,7 +94,7 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         [Fact]
         public async Task QueryWithPassedComplexVariable_TypeNameFromTypeName()
         {
-            var query = GqlQuery<List<Continent>>.Build<IQuery>(q => q.GetContinents(QueryVariable.Pass<ContinentFilterInput>("filter")))
+            var query = _builder.Build(q => q.GetContinents(QueryVariable.Pass<ContinentFilterInput>("filter")))
             .WithVariable("filter", new ContinentFilterInput { code = new StringFilterInput { @in = ["AF", "AS"] } });
 
             var afAndAs = await Execute(query);

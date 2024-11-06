@@ -1,5 +1,6 @@
 ﻿using MTecl.GraphQlClient.Exceptions;
 using MTecl.GraphQlClient.ObjectMapping.Rendering;
+using MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors;
 using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,10 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace MTecl.GraphQlClient
+namespace MTecl.GraphQlClient.Execution
 {
     public class GqlRequestOptions
-    {       
+    {
         public RequestHeaders CustomRequestHeaders { get; } = new RequestHeaders().Set("accept", "application/json");
 
         public Uri RequestUri { get; set; }
@@ -25,22 +26,10 @@ namespace MTecl.GraphQlClient
         public IRequestMessageBuilder RequestMessageBuilder { get; set; } = DefaultRequestMessageBuilder.Instance;
         public Func<HttpResponseMessage, string, Exception> CreateResponseException { get; set; } = (response, responseString) => new Exception($"({response.StatusCode}): {responseString}");
 
-        public IResponseDeserializer ResponseDeserializer { get; set; } = DefaultResponseDeserializer.Instance;
-
         public interface IRequestMessageBuilder
         {
             HttpRequestMessage CreateHttpRequestMessage(Uri uri, Dictionary<string, string> headers, string body, Encoding encoding);
         }
-
-        public JsonSerializerOptions JsonSerializerOptions { get; set; } = new JsonSerializerOptions()
-        {
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,            
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            Converters = { new CustomDateTimeConverter("yyyy-MM-dd HH:mm:ss") }
-        };
-                
-        public RenderOptions RenderOptions { get; set; } = RenderOptions.Default;
 
         private sealed class DefaultRequestMessageBuilder : IRequestMessageBuilder
         {
@@ -64,10 +53,8 @@ namespace MTecl.GraphQlClient
             }
         }
 
-        public interface IResponseDeserializer
-        {
-            T DeserializeResponse<T>(string response, JsonSerializerOptions serializerOptions);
-        }        
+        public IResponseDeserializer ResponseDeserializer { get; set; } = DefaultResponseDeserializer.Instance;
+
 
         public sealed class RequestHeaders : Dictionary<string, string>
         {

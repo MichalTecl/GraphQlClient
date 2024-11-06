@@ -12,6 +12,8 @@ namespace MTecl.GraphQlClient.Execution
 
         GqlRequestOptions Options { get; }
 
+        GraphQlQueryBuilder Builder { get; }
+
         string QueryName { get; }
     }
 }

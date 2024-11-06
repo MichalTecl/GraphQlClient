@@ -17,7 +17,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
             var usersNode = query.FindChild("Users");
             usersNode.Should().NotBeNull();
 
-            usersNode.Nodes.Filtered.Should().HaveCount(3);
+            usersNode.Nodes.Filtered.Should().HaveCount(4);
 
             var bigPp = usersNode.FindChild("BigProfilePicture");
             bigPp.Should().NotBeNull();
@@ -47,7 +47,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
             var usersNode = query.FindChild("Users");
             usersNode.Should().NotBeNull();
                         
-            usersNode.Nodes.Filtered.Should().HaveCount(4);
+            usersNode.Nodes.Filtered.Should().HaveCount(typeof(User).GetProperties().Length);
 
             var bigPp = usersNode.FindChild("BigProfilePicture");
             bigPp.Should().NotBeNull();

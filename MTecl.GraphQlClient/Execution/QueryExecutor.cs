@@ -22,7 +22,7 @@ namespace MTecl.GraphQlClient.Execution
                 variables = (data.Variables?.Count ?? 0) == 0 ? null : data.Variables 
             };
 
-            string requestString = JsonSerializer.Serialize(requestModel, options.JsonSerializerOptions);
+            string requestString = JsonSerializer.Serialize(requestModel, data.Builder.JsonSerializerOptions);
 
             string responseString = null;
             using (var httpRequestMessage = options.RequestMessageBuilder.CreateHttpRequestMessage(uri, options.CustomRequestHeaders, requestString, options.Encoding))
@@ -45,7 +45,7 @@ namespace MTecl.GraphQlClient.Execution
                 }
             }
 
-            return options.ResponseDeserializer.DeserializeResponse<TResult>(responseString, options.JsonSerializerOptions);
+            return options.ResponseDeserializer.DeserializeResponse<TResult>(responseString, data.Builder);
         }        
     }
 }

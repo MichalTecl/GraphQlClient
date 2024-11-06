@@ -25,6 +25,8 @@ namespace ConsoleApp1
             var dtFrom = DateTime.Now.AddDays(-365);
 
             var orderlist = await bw.GetOrders(dtFrom);
+
+
         }
     }
 }

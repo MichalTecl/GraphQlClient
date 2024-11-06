@@ -33,7 +33,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
             }
             
             renderHelper.OpenCodeBlock();                        
-            Nodes.Render(renderHelper.StringBuilder, renderHelper.RenderOptions);
+            Nodes.Render(renderHelper.StringBuilder, renderHelper.Builder);
             renderHelper.CloseCodeBlock();            
         }
 
