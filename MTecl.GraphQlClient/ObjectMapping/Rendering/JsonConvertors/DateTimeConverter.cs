@@ -8,29 +8,22 @@ using System.Globalization;
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors
 {
     public class DateTimeConverter : JsonConverter<DateTime>
-    {        
-        public IDateTimeConversionMode Mode { get; set; }
-             
+    {
+        private readonly GraphQlQueryBuilder _builder;
+
+        public DateTimeConverter(GraphQlQueryBuilder builder)
+        {
+            _builder = builder;
+        }
+
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (Mode == null) 
-            {
-                return (DateTime)JsonSerializer.Deserialize(ref reader, typeToConvert, options);
-            }
-
-            return Mode.Read(ref reader, options);
-            
+            return _builder.DateTimeConversionMode.Read(ref reader, options);            
         }
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            if (Mode == null)
-            {
-                JsonSerializer.Serialize(writer, value, typeof(DateTime), options);
-                return;
-            }
-
-            Mode.Write(writer, value, options);
+            _builder.DateTimeConversionMode.Write(writer, value, options);
         }
 
         public interface IDateTimeConversionMode

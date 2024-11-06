@@ -19,9 +19,9 @@ namespace MTecl.GraphQlClient.ObjectMapping
         private static readonly DefaultMethodVisitor _defaultVisitor = new DefaultMethodVisitor();
         private static readonly ConcurrentDictionary<MethodInfo, IMethodVisitor> _visitorCache = new ConcurrentDictionary<MethodInfo, IMethodVisitor>();
        
-        public static QueryNode<TQuery> MapQuery<TQuery, TResult>(Expression<Func<TQuery, TResult>> expression)
+        public static QueryNode MapQuery<TQuery, TResult>(Expression<Func<TQuery, TResult>> expression)
         {
-            var node = new QueryNode<TQuery>();
+            var node = new QueryNode();
 
             if(!(expression.Body is MethodCallExpression methodCallExpression)) 
                 throw new ArgumentException("Method call expected");

@@ -1,6 +1,7 @@
 ﻿using MTecl.GraphQlClient.Execution;
 using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel;
+using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
 using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors;
 using System;
@@ -27,7 +28,7 @@ namespace MTecl.GraphQlClient
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };                       
 
-            JsonSerializerOptions.Converters.Add(DateTimeConverter);
+            JsonSerializerOptions.Converters.Add(new DateTimeConverter(this));
             JsonSerializerOptions.Converters.Add(new EnumValueConverter(false));
 
             InputObjectSerializer = new GqlObjectSerializer(this);
@@ -37,26 +38,46 @@ namespace MTecl.GraphQlClient
 
         public Func<string, string> CustomizeQueryText { get; set; }
 
-        public DateTimeConverter DateTimeConverter { get; } = new DateTimeConverter
-        {
-            // By default ISO 8601 https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#Roundtrip
-            Mode = DateTimeConverter.StringConversionMode("o", CultureInfo.InvariantCulture)
-        };
+        /// <summary>
+        /// By default ISO 8601 https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#Roundtrip
+        /// 
+        /// Use <see cref="DateTimeConverter.StringConversionMode"/> to specify string format, or implement <see cref="DateTimeConverter.IDateTimeConversionMode"/> to use any other DT format
+        /// </summary>
+        public DateTimeConverter.IDateTimeConversionMode DateTimeConversionMode { get; set; } = DateTimeConverter.StringConversionMode("o", CultureInfo.InvariantCulture);
 
-        public bool ConvertFieldNamesToCamelCase { get; set; } = true;
-
+        /// <summary>
+        /// Converts objects to GraphQL notation (slightly different than valid JSON, of course...)
+        /// By default <see cref="GqlObjectSerializer"/> is used
+        /// </summary>
         public IInputObjectSerializer InputObjectSerializer { get; set; }
 
         public JsonSerializerOptions JsonSerializerOptions { get; set; }        
                 
+        /// <summary>
+        /// For very specific cases where non-generic variant of the builder is needed. 
+        /// </summary>
+        /// <returns></returns>
         public static GraphQlQueryBuilder Create() => new GraphQlQueryBuilder();
     }
 
+    /// <summary>
+    /// This class is responsible for building (compiling) of GraphQL queries based on C# expressions. Please keep in mind that query compilation utilizes lot of reflection, 
+    /// string manipulation and other expensive operations. Therefore it's good idea to keep compiled queries as static singletons. Use variables and see <link to best practices></link>
+    /// </summary>
+    /// <typeparam name="TQueryType">Type of queries root object (typically an interface)</typeparam>
     public class GraphQlQueryBuilder<TQueryType> : GraphQlQueryBuilder
     {
-        public IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression)
-        {            
+        public IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression) => Build(expression, _ => { });
+        
+        public IQuery<TResult> BuildMutation<TResult>(Expression<Func<TQueryType, TResult>> expression)
+        {
+            return Build(expression, n => { n.NodeTypeSymbol = "mutation"; });
+        }
+
+        private IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression, Action<QueryNode> modifyQuery)
+        {
             var built = QueryMapper.MapQuery(expression);
+            modifyQuery(built);
 
             CustomizeQueryGraph?.Invoke(built);
 
@@ -69,6 +90,7 @@ namespace MTecl.GraphQlClient
 
             return new GqlQuery<TResult>(query, this);
         }
+
 
         private sealed class GqlQuery<TResult> : IQuery<TResult>
         {

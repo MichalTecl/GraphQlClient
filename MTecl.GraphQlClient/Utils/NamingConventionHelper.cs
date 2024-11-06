@@ -1,5 +1,6 @@
 ﻿
 using MTecl.GraphQlClient.ObjectMapping.Rendering;
+using System.Text.Json;
 
 namespace MTecl.GraphQlClient.Utils
 {
@@ -7,7 +8,7 @@ namespace MTecl.GraphQlClient.Utils
     {
         public static string ConvertName(string name, GraphQlQueryBuilder options)
         {
-            if (options.ConvertFieldNamesToCamelCase)
+            if (options.JsonSerializerOptions.PropertyNamingPolicy == JsonNamingPolicy.CamelCase)
                 name = CCase(name);
 
             return name;

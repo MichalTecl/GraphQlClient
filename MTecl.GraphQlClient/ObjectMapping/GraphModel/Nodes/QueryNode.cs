@@ -7,18 +7,21 @@ using System.Text;
 
 namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes
 {
-    internal class QueryNode<TResult> : NodeBase, IQueryNode
+    internal class QueryNode : NodeBase, IQueryNode
     {
-        public override string NodeId => $"Query<{typeof(TResult).Name}>";
+        public override string NodeId => $"QUERY";
 
         public override bool IsImportant => true;
 
         public QueryVariables QueryVariables { get; } = new QueryVariables();
+        
         public string QueryName { get; set; }
+
+        public string NodeTypeSymbol { get; set; } = "query";
 
         protected override void Render(RenderHelper renderHelper)
         {
-            renderHelper.Literal("query ");
+            renderHelper.Literal(NodeTypeSymbol).Literal(" ");
 
             if (!string.IsNullOrWhiteSpace(QueryName))
                 renderHelper.Literal(QueryName);
