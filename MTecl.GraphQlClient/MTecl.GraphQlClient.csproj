@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>GraphQL Client</Title>
+    <Authors>Michal Tecl</Authors>
+    <Description>GraphQlClient is a powerful library for creating type-safe and resilient clients to consume GraphQL services. It provides a developer-friendly interface that makes building and executing GraphQL queries and mutations intuitive and efficient. With a focus on type safety, GraphQlClient helps you catch potential errors at compile-time, ensuring reliable and maintainable integration with any GraphQL API.</Description>
+    <RepositoryUrl>https://github.com/MichalTecl/GraphQlClient</RepositoryUrl>
+    <PackageTags>graphql-client</PackageTags>
+    <Copyright>© 2024 Michal Tecl. Distributed under the MIT License.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

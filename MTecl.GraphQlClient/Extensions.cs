@@ -22,7 +22,6 @@ namespace MTecl.GraphQlClient
         [TreeVisitor(typeof(WithVisitor))]
         public static IEnumerable<T> EachWith<T>(this IEnumerable<T> src, params Func<T, object>[] f) => (IEnumerable<T>)Nope();
 
-
         [TreeVisitor(typeof(WithVisitor))]
         public static T With<T>(this T src, params Func<T, object>[] f) => (T)Nope();
                 

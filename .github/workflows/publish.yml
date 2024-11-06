@@ -1,0 +1,33 @@
+﻿name: Publish to NuGet
+
+on:
+  push:
+    branches:
+      - main # Spustí se při každém push do větve main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x' # Použijeme .NET Core SDK 3.1, kompatibilní s .NET Standard 2.0
+
+      - name: Restore dependencies
+        run: dotnet restore MTecl.GraphQlClient/MTecl.GraphQlClient.csproj
+
+      - name: Build
+        run: dotnet build MTecl.GraphQlClient/MTecl.GraphQlClient.csproj --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        run: dotnet pack MTecl.GraphQlClient/MTecl.GraphQlClient.csproj --configuration Release --no-build -o ./output
+
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "./output/*.nupkg" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
