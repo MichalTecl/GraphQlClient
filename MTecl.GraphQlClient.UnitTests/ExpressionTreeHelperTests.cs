@@ -1,4 +1,3 @@
-using FluentAssertions;
 using MTecl.GraphQlClient.Utils;
 using System.Linq.Expressions;
 

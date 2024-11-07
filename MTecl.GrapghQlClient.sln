@@ -9,6 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTecl.GraphQlClient.UnitTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTecl.GraphQlClient.IntegrationTests", "MTecl.GraphQlClient.IntegrationTests\MTecl.GraphQlClient.IntegrationTests.csproj", "{85802526-BC70-40E8-94D7-0D0AA1C39600}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E8BD5AD6-532B-4766-A10A-B756EBB3199E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{8BF723C0-BD89-4186-A309-2F590B1370E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{03784EE5-56EA-48DA-AF22-F3F3C7D4479C}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Playground\Playground.csproj", "{95E96675-454D-471D-8279-BFC485C66D2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +38,17 @@ Global
 		{85802526-BC70-40E8-94D7-0D0AA1C39600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85802526-BC70-40E8-94D7-0D0AA1C39600}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85802526-BC70-40E8-94D7-0D0AA1C39600}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E96675-454D-471D-8279-BFC485C66D2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E96675-454D-471D-8279-BFC485C66D2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E96675-454D-471D-8279-BFC485C66D2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E96675-454D-471D-8279-BFC485C66D2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8BF723C0-BD89-4186-A309-2F590B1370E2} = {E8BD5AD6-532B-4766-A10A-B756EBB3199E}
+		{03784EE5-56EA-48DA-AF22-F3F3C7D4479C} = {8BF723C0-BD89-4186-A309-2F590B1370E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4EB8ACAD-9FDB-4A77-8F25-B0B2E2D02773}

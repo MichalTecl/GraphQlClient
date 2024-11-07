@@ -1,12 +1,6 @@
 ﻿using FluentAssertions;
 using MTecl.GraphQlClient.Exceptions;
 using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient.UnitTests
 {

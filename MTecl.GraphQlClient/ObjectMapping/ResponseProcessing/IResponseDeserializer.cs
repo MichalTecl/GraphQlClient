@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
-
-namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
+﻿namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
 {
+    /// <summary>
+    /// Implementing class is responsible for results deserialization
+    /// </summary>
     public interface IResponseDeserializer
     {
         T DeserializeResponse<T>(string response, GraphQlQueryBuilder Options);

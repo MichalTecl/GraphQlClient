@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
+﻿namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
 {
-    public interface IGqlMember
+    public interface IGqlMember 
     {
-        FieldInclusionMode InclusionMode { get; set; }
+        FieldInclusionMode InclusionMode { get; }
 
         string Name { get; }
 

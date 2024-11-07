@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MTecl.GraphQlClient.Execution
 {
@@ -13,7 +11,5 @@ namespace MTecl.GraphQlClient.Execution
         GqlRequestOptions Options { get; }
 
         GraphQlQueryBuilder Builder { get; }
-
-        string QueryName { get; }
     }
 }

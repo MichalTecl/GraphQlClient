@@ -2,11 +2,9 @@
 using MTecl.GraphQlClient.ObjectMapping.GraphModel;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
 using MTecl.GraphQlClient.ObjectMapping.Visitors;
-using MTecl.GraphQlClient.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -22,19 +20,12 @@ namespace MTecl.GraphQlClient.ObjectMapping
         public static QueryNode MapQuery<TQuery, TResult>(Expression<Func<TQuery, TResult>> expression)
         {
             var node = new QueryNode();
-
-            if(!(expression.Body is MethodCallExpression methodCallExpression)) 
-                throw new ArgumentException("Method call expected");
-
-            VisitMethod(node, methodCallExpression);
-
+            Visit(node, expression);            
             return node;
         }
 
         private static INode VisitMethod(INode parent, MethodCallExpression mce)
         {
-
-
             var visitor = ResolveVisitor(mce.Method);
 
             return visitor.Visit(parent, mce);
@@ -69,8 +60,6 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
             if (created == null)
                 throw new NotSupportedException($"Unexpected type of expression {e.GetType().Name}: {e}");
-
-            created.Expression = e;
 
             return created;
         }

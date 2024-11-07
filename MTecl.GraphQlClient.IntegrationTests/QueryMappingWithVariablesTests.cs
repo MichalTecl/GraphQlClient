@@ -1,11 +1,6 @@
 ﻿using FluentAssertions;
 using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient.IntegrationTests
 {

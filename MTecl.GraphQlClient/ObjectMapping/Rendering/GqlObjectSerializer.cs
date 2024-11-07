@@ -1,38 +1,32 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering
 {
-    internal class GqlObjectSerializer : IInputObjectSerializer
+    internal static class GqlObjectSerializer 
     {
         internal const string LiteralStringPrefix = "###__LITERAL_TO_UNWRAP_IN_GQL_NOTATION__##:";
-
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
-
+               
         private static readonly EnumValueConverter _gqlNotationEnumConverter = new EnumValueConverter(true);
 
-        public GqlObjectSerializer(GraphQlQueryBuilder builder)
+        public static string Serialize(object o, GraphQlQueryBuilder builder)
         {
+            var jsonSerializerOptions = builder.JsonSerializerOptions;
+
             // We have to clone options to pass special convertor for enums. But it's only happening during compilation (when input object is passed as a part of query), so it's ok
-            _jsonSerializerOptions = new JsonSerializerOptions(builder.JsonSerializerOptions);
-            var existingEnumConverter = _jsonSerializerOptions.Converters.FirstOrDefault(c => c.GetType() == typeof(EnumValueConverter));
-            if (existingEnumConverter != null) 
+            jsonSerializerOptions = new JsonSerializerOptions(builder.JsonSerializerOptions);
+            var existingEnumConverter = jsonSerializerOptions.Converters.FirstOrDefault(c => c.GetType() == typeof(EnumValueConverter));
+            if (existingEnumConverter != null)
             {
-                _jsonSerializerOptions.Converters.Remove(existingEnumConverter);
+                jsonSerializerOptions.Converters.Remove(existingEnumConverter);
             }
 
-            _jsonSerializerOptions.Converters.Add(_gqlNotationEnumConverter);
-        }
+            jsonSerializerOptions.Converters.Add(_gqlNotationEnumConverter);
 
-        public string Serialize(object o)
-        {
-            var jDocument = JsonSerializer.SerializeToDocument(o, _jsonSerializerOptions);
+            var jDocument = JsonSerializer.SerializeToDocument(o, jsonSerializerOptions);
 
             return SerializeNode(jDocument.RootElement);
         }

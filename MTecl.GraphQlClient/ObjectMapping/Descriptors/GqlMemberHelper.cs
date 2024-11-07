@@ -1,12 +1,9 @@
-﻿using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
-using MTecl.GraphQlClient.Utils;
+﻿using MTecl.GraphQlClient.Utils;
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Descriptors

@@ -1,16 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors
 {
 
+    /// <summary>
+    /// Forces JsonSerializer to serialize enum member names instead of numeric values.
+    /// </summary>
     public class EnumValueConverter : JsonConverterFactory
     {
         private readonly bool _gqlNotation;
 
+        /// <summary>
+        /// Creates new instance of EnumValueConverter
+        /// </summary>
+        /// <param name="gqlNotation">True = values are serialized WITHOUT quotation marks; False = values are serialized as strings</param>
         public EnumValueConverter(bool gqlNotation)
         {
             _gqlNotation = gqlNotation;
@@ -102,8 +107,6 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors
                     writer.WriteStringValue(string.Concat(GqlObjectSerializer.LiteralStringPrefix, strValue));
                 else
                     writer.WriteStringValue(strValue);
-
-
             }
         }
     }

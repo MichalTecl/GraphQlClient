@@ -3,10 +3,8 @@ using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
 using MTecl.GraphQlClient.ObjectMapping.Visitors;
 using MTecl.GraphQlClient.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MTecl.GraphQlClient.ObjectMapping.MethodVisitors
 {

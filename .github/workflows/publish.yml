@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - main # Spustí se při každém push do větve main
+      - nuget # Spustí se při každém push nebo merge do větve "nuget"
 
 jobs:
   publish:

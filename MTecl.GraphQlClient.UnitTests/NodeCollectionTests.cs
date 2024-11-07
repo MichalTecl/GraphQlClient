@@ -1,14 +1,9 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.GraphModel;
-using MTecl.GraphQlClient.ObjectMapping.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using Xunit;
 
 namespace MTecl.GraphQlClient.UnitTests
-{    
+{
     public class NodeCollectionTests
     {
         private class MockNode : INode
