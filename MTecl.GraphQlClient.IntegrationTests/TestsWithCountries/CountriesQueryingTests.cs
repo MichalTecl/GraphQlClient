@@ -1,12 +1,6 @@
 ﻿using FluentAssertions;
 using MTecl.GraphQlClient.Execution;
-using MTecl.GraphQlClient.ObjectMapping;
 using MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 {
@@ -30,14 +24,14 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
                 }
             };
 
-            _options.CustomRequestHeaders["Accept"] = "application/json, multipart/mixed";
-            _options.CustomRequestHeaders["Accept-Encoding"] = "utf-8";            
+            //_options.CustomRequestHeaders["Accept"] = "application/json, multipart/mixed";
+            //_options.CustomRequestHeaders["Accept-Encoding"] = "utf-8";            
         }
 
         [Fact]
         public async Task SimpleQueryOneLevelWithoutVariables()
         {
-            var query = _builder.Build(q => q.GetContinent("EU"));
+            var query = _builder.Build("getEuQuery", q => q.GetContinent("EU"));
 
             var eu = await Execute(query);
 
@@ -49,6 +43,30 @@ namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
         public async Task QueryWithVariable()
         {
             var query = _builder.Build(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID"))).WithVariable("code", "NA");
+
+            var northAmerica = await Execute(query);
+
+            northAmerica.Should().NotBeNull();
+            northAmerica.code.Should().Be("NA");
+        }
+
+        [Fact]
+        public async Task QueryWithVariablesAsDictionary()
+        {
+            var query = _builder.Build(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID")))
+                .WithVariables(new Dictionary<string, object> { { "code", "NA" } });
+
+            var northAmerica = await Execute(query);
+
+            northAmerica.Should().NotBeNull();
+            northAmerica.code.Should().Be("NA");
+        }
+
+        [Fact]
+        public async Task QueryWithVariablesObject()
+        {
+            var query = _builder.Build(q => q.GetContinent(QueryVariable.Pass<string>("$code", "ID")))
+                .WithVariables(new { code = "NA" });
 
             var northAmerica = await Execute(query);
 

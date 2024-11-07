@@ -30,8 +30,6 @@ namespace MTecl.GraphQlClient
 
             JsonSerializerOptions.Converters.Add(new DateTimeConverter(this));
             JsonSerializerOptions.Converters.Add(new EnumValueConverter(false));
-            
-            InputObjectSerializer = new GqlObjectSerializer(this);
         }
 
         public Action<INode> CustomizeQueryGraph { get; set; }
@@ -44,13 +42,7 @@ namespace MTecl.GraphQlClient
         /// Use <see cref="DateTimeConverter.StringConversionMode"/> to specify string format, or implement <see cref="DateTimeConverter.IDateTimeConversionMode"/> to use any other DT format
         /// </summary>
         public DateTimeConverter.IDateTimeConversionMode DateTimeConversionMode { get; set; } = DateTimeConverter.StringConversionMode("o", CultureInfo.InvariantCulture);
-
-        /// <summary>
-        /// Converts objects to GraphQL notation (slightly different than valid JSON, of course...)
-        /// By default <see cref="GqlObjectSerializer"/> is used
-        /// </summary>
-        public IInputObjectSerializer InputObjectSerializer { get; set; }
-
+                
         public JsonSerializerOptions JsonSerializerOptions { get; set; }        
                 
         /// <summary>
@@ -67,16 +59,48 @@ namespace MTecl.GraphQlClient
     /// <typeparam name="TQueryType">Type of queries root object (typically an interface)</typeparam>
     public class GraphQlQueryBuilder<TQueryType> : GraphQlQueryBuilder
     {
-        public IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression) => Build(expression, _ => { });
-        
-        public IQuery<TResult> BuildMutation<TResult>(Expression<Func<TQueryType, TResult>> expression)
+        /// <summary>
+        /// Builds a query object
+        /// </summary>
+        /// <typeparam name="TResult">Type of query result</typeparam>
+        /// <param name="queryName">Name of the query</param>
+        /// <param name="expression">An expression tree describing the query graph</param>
+        /// <returns>Query object</returns>
+        public IQuery<TResult> Build<TResult>(string queryName, Expression<Func<TQueryType, TResult>> expression) => Build(queryName, expression, _ => { });
+
+        /// <summary>
+        /// Builds a query object
+        /// </summary>
+        /// <typeparam name="TResult">Type of query result</typeparam>
+        /// <param name="expression">An expression tree describing the query graph</param>
+        /// <returns>Query object</returns>
+        public IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression) => Build(null, expression);
+
+        /// <summary>
+        /// Builds a mutation object
+        /// </summary>
+        /// <typeparam name="TResult">Type of query result</typeparam>
+        /// <param name="queryName">Name fo the query</param>
+        /// <param name="expression">An expression tree describing the query graph</param>
+        /// <returns>Query object</returns>
+        public IQuery<TResult> BuildMutation<TResult>(string queryName, Expression<Func<TQueryType, TResult>> expression)
         {
-            return Build(expression, n => { n.NodeTypeSymbol = "mutation"; });
+            return Build(queryName, expression, n => { n.NodeTypeSymbol = "mutation"; });
         }
 
-        private IQuery<TResult> Build<TResult>(Expression<Func<TQueryType, TResult>> expression, Action<QueryNode> modifyQuery)
+        /// <summary>
+        /// Builds a mutation object
+        /// </summary>
+        /// <typeparam name="TResult">Type of query result</typeparam>
+        /// <param name="expression">An expression tree describing the query graph</param>
+        /// <returns>Query object</returns>
+        public IQuery<TResult> BuildMutation<TResult>(Expression<Func<TQueryType, TResult>> expression) => BuildMutation(null, expression);
+
+        private IQuery<TResult> Build<TResult>(string queryName, Expression<Func<TQueryType, TResult>> expression, Action<QueryNode> modifyQuery)
         {
             var built = QueryMapper.MapQuery(expression);
+            built.QueryName = queryName;
+
             modifyQuery(built);
 
             CustomizeQueryGraph?.Invoke(built);

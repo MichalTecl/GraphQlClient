@@ -1,30 +1,52 @@
-﻿using MTecl.GraphQlClient.Exceptions;
-using MTecl.GraphQlClient.ObjectMapping.Rendering;
-using MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors;
-using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
+﻿using MTecl.GraphQlClient.ObjectMapping.ResponseProcessing;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 
 namespace MTecl.GraphQlClient.Execution
 {
     public class GqlRequestOptions
     {
-        public RequestHeaders CustomRequestHeaders { get; } = new RequestHeaders().Set("accept", "application/json");
+        /// <summary>
+        /// Request headers
+        /// </summary>
+        public Dictionary<string, string> CustomRequestHeaders { get; } = new Dictionary<string, string> { { "accept", "application/json" } };
 
+        /// <summary>
+        /// URL of GraphQL API
+        /// </summary>
         public Uri RequestUri { get; set; }
 
+        /// <summary>
+        /// Possibility to obtain raw request data, mostly for logging or debugging purposes
+        /// </summary>
         public Action<string> RawRequestPeek { get; set; } = _ => {; };
 
+        /// <summary>
+        /// Possibility to obtain raw response data, mostly for logging or debugging purposes
+        /// </summary>
         public Action<string> RawResponsePeek { get; set; } = _ => {; };
 
+        /// <summary>
+        /// Communication encoding
+        /// </summary>
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
+        /// <summary>
+        /// This instance will be used to generate HttpRequestMessage with all request data
+        /// </summary>
         public IRequestMessageBuilder RequestMessageBuilder { get; set; } = DefaultRequestMessageBuilder.Instance;
+        
+        /// <summary>
+        /// Can be used to modify processing of Http communication errors (! this is not about query errors returned from API !)
+        /// </summary>
         public Func<HttpResponseMessage, string, Exception> CreateResponseException { get; set; } = (response, responseString) => new Exception($"({response.StatusCode}): {responseString}");
+
+        /// <summary>
+        /// This instance will be used to deserialize received responses from GraphQL API
+        /// </summary>
+        public IResponseDeserializer ResponseDeserializer { get; set; } = DefaultResponseDeserializer.Instance;
 
         public interface IRequestMessageBuilder
         {
@@ -53,16 +75,6 @@ namespace MTecl.GraphQlClient.Execution
             }
         }
 
-        public IResponseDeserializer ResponseDeserializer { get; set; } = DefaultResponseDeserializer.Instance;
-
-
-        public sealed class RequestHeaders : Dictionary<string, string>
-        {
-            public RequestHeaders Set(string key, string value)
-            {
-                this[key] = value;
-                return this;
-            }
-        }
+        
     }
 }

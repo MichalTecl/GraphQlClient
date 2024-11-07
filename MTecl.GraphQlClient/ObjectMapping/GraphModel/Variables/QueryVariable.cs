@@ -3,14 +3,13 @@ using MTecl.GraphQlClient.ObjectMapping.GraphModel.Nodes;
 using MTecl.GraphQlClient.ObjectMapping.Rendering;
 using MTecl.GraphQlClient.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
 namespace MTecl.GraphQlClient.ObjectMapping.GraphModel.Variables
-{    
+{
     public abstract class QueryVariable
     {      
         public static T Pass<T>(string name, bool optional, string graphQlTypeName) 

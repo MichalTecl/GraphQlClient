@@ -9,6 +9,7 @@
     <PackageTags>graphql-client</PackageTags>
     <Copyright>© 2024 Michal Tecl. Distributed under the MIT License.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

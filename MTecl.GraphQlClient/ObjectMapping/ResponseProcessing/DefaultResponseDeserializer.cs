@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static MTecl.GraphQlClient.Execution.GqlRequestOptions;
+using static MTecl.GraphQlClient.Exceptions.ServerErrorResponseException;
 
 namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
 {
@@ -22,9 +21,9 @@ namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
             {
                 try
                 {
-                    var errors = node.Deserialize<Errors>();
+                    var errors = node.Deserialize<Errors>(builder.JsonSerializerOptions);
 
-                    throw new ServerErrorResponseException(response, errors.GetErrorsText());
+                    throw new ServerErrorResponseException(response, errors.errors);
                 }
                 catch (ServerErrorResponseException)
                 {
@@ -47,42 +46,9 @@ namespace MTecl.GraphQlClient.ObjectMapping.ResponseProcessing
             return valueNode.Value.Deserialize<T>(builder.JsonSerializerOptions);
         }
 
-        #region Model
-        private sealed class Errors
+        public sealed class Errors
         {
             public List<ErrorModel> errors { get; set; }
-
-            public string GetErrorsText() => string.Join(Environment.NewLine, errors);
         }
-
-        private sealed class ErrorModel
-        {
-            public string message { get; set; }
-            public List<object> path { get; set; }
-            public List<ErrorLocation> locations { get; set; }
-
-            public override string ToString()
-            {
-                var parts = new string[] {
-                   message ?? "ERROR",
-                   locations == null || locations.Count == 0 ? string.Empty : $"[{string.Join(", ", locations)}]",
-                   path == null || path.Count == 0 ? string.Empty : string.Join("/", path)
-                };
-
-                return string.Join(" ", parts);
-            }
-        }
-
-        private sealed class ErrorLocation
-        {
-            public int line { get; set; }
-            public int column { get; set; }
-
-            public override string ToString()
-            {
-                return $"ln: {line}, col: {column}";
-            }
-        }
-        #endregion
     }
 }

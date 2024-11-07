@@ -1,6 +1,4 @@
-﻿
-using MTecl.GraphQlClient.ObjectMapping.Rendering;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace MTecl.GraphQlClient.Utils
 {

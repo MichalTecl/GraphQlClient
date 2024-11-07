@@ -1,10 +1,11 @@
 ﻿using MTecl.GraphQlClient.ObjectMapping.Descriptors;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MTecl.GraphQlClient
 {
+    /// <summary>
+    /// Specifies GraphQL type name of marked class
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class GqlTypeAttribute : Attribute, IGraphQlType
     {

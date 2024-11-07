@@ -53,69 +53,7 @@ namespace MTecl.GraphQlClient.IntegrationTests
             var rendered = query.ToString();
             rendered.Should().Contain("orders(orderNr: $v1)");
         }
-
-        [Fact]
-        public void ArgumentsPassedAsObject()
-        {
-            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument(new { orderNr = "1234", country = "cz"})
-
-                .With(o => o.Customer.Argument(new { email = QueryVariable.GetVariableNameRenderer("$v1") }), o => o.Products)
-                );
-
-
-            var ordersNode = query.FindChild("Orders");
-            ordersNode.Should().NotBeNull();
-
-            ordersNode.Arguments.Should().HaveCount(2);
-            ordersNode.Arguments[0].Key.Should().Be("orderNr");
-            ordersNode.Arguments[0].Value.ToString().Should().Be("1234");
-
-            ordersNode.Arguments[1].Key.Should().Be("country");
-            ordersNode.Arguments[1].Value.ToString().Should().Be("cz");
-
-            var customerNode = query.FindChild("Customer");
-            customerNode.Should().NotBeNull();
-
-            customerNode.Arguments.Should().HaveCount(1);
-            customerNode.Arguments[0].Key.Should().Be("email");
-
-            var rendered = query.ToString();
-
-            rendered.Should().Contain("orders(orderNr: \"1234\", country: \"cz\")");
-            rendered.Should().Contain("customer(email: $v1)");
-        }
-
-        [Fact]
-        public void ArgumentsPassedAsDictionary()
-        {
-            var query = QueryMapper.MapQuery<OrdersQuery, IEnumerable<Order>>(o => o.Orders.Argument(new Dictionary<string, object> { { "orderNr", "1234" }, { "country", "cz" } })
-
-                .With(o => o.Customer.Argument(new Dictionary<string, object> { { "email", QueryVariable.GetVariableNameRenderer("$v1") } }), o => o.Products)
-                );
-
-
-            var ordersNode = query.FindChild("Orders");
-            ordersNode.Should().NotBeNull();
-
-            ordersNode.Arguments.Should().HaveCount(2);
-            ordersNode.Arguments[0].Key.Should().Be("orderNr");
-            ordersNode.Arguments[0].Value.ToString().Should().Be("1234");
-
-            ordersNode.Arguments[1].Key.Should().Be("country");
-            ordersNode.Arguments[1].Value.ToString().Should().Be("cz");
-
-            var customerNode = query.FindChild("Customer");
-            customerNode.Should().NotBeNull();
-
-            customerNode.Arguments.Should().HaveCount(1);
-            customerNode.Arguments[0].Key.Should().Be("email");
-
-            var rendered = query.ToString();
-
-            rendered.Should().Contain("orders(orderNr: \"1234\", country: \"cz\")");
-            rendered.Should().Contain("customer(email: $v1)");
-        }
-
+                
         class OrdersQuery
         {
             public IEnumerable<Order> Orders { get; set; }

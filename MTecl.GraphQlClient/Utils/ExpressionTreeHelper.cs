@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace MTecl.GraphQlClient.Utils
 {
-    public static class ExpressionTreeHelper
+    internal static class ExpressionTreeHelper
     {
         public static object EvaluateExpression(Expression e)
         {

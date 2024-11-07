@@ -4,7 +4,7 @@ namespace MTecl.GraphQlClient.UnitTests
 {
     public class GqlObjectSerializerTests
     {
-        private readonly GqlObjectSerializer _sut = new GqlObjectSerializer(GraphQlQueryBuilder.Create());
+        private readonly GraphQlQueryBuilder _builder = GraphQlQueryBuilder.Create();
 
         [Fact]
         public void Serialize_ShouldConvertSimpleObjectToGraphQLInput()
@@ -18,7 +18,7 @@ namespace MTecl.GraphQlClient.UnitTests
             };
 
             // Act
-            string result = _sut.Serialize(obj);
+            string result = GqlObjectSerializer.Serialize(obj, _builder);
 
             // Assert
             Assert.Equal("{ name: \"John\", age: 30, isMember: true }", result);
@@ -39,7 +39,7 @@ namespace MTecl.GraphQlClient.UnitTests
             };
 
             // Act
-            string result = _sut.Serialize(obj);
+            string result = GqlObjectSerializer.Serialize(obj, _builder);
 
             // Assert
             Assert.Equal("{ name: \"John\", address: { street: \"123 Main St\", city: \"New York\" } }", result);
@@ -55,7 +55,7 @@ namespace MTecl.GraphQlClient.UnitTests
             };
 
             // Act
-            string result = _sut.Serialize(obj);
+            string result = GqlObjectSerializer.Serialize(obj, _builder);
 
             // Assert
             Assert.Equal("{ items: [ \"apple\", \"banana\", \"cherry\" ] }", result);
@@ -68,7 +68,7 @@ namespace MTecl.GraphQlClient.UnitTests
             var obj = new { };
 
             // Act
-            string result = _sut.Serialize(obj);
+            string result = GqlObjectSerializer.Serialize(obj, _builder);
 
             // Assert
             Assert.Equal("{  }", result);
@@ -92,7 +92,7 @@ namespace MTecl.GraphQlClient.UnitTests
             };
 
             // Act
-            string result = _sut.Serialize(dictionary);
+            string result = GqlObjectSerializer.Serialize(dictionary, _builder);
 
             // Assert
             Assert.Equal("{ name: \"Alice\", age: 28, isMember: true, address: { street: \"456 Maple Rd\", city: \"Los Angeles\" } }", result);
@@ -111,7 +111,7 @@ namespace MTecl.GraphQlClient.UnitTests
             };
 
             // Act
-            string result = _sut.Serialize(obj);
+            string result = GqlObjectSerializer.Serialize(obj, _builder);
 
             // Assert
             Assert.Equal("{ name: \"Alice\", isMember: true }", result);
@@ -122,7 +122,7 @@ namespace MTecl.GraphQlClient.UnitTests
         {
             var obj = new { e = Enum1.ValueA, x = new { f = Enum1.ValueB }};
             
-            var result = _sut.Serialize(obj);
+            var result = GqlObjectSerializer.Serialize(obj, _builder);
 
             Assert.Equal($"{{ e: {nameof(Enum1.ValueA)}, x: {{ f: {nameof(Enum1.ValueB)} }} }}", result);
         }

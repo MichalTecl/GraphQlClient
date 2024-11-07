@@ -1,11 +1,4 @@
-﻿using FluentAssertions.Equivalency;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
+﻿namespace MTecl.GraphQlClient.IntegrationTests.TestsWithCountries
 {
     public class Continent
     {

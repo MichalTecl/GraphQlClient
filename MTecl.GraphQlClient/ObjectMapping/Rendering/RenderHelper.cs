@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Web;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering
 {
@@ -76,7 +72,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering
             }
             else
             {
-                _sb.Append(_builder.InputObjectSerializer.Serialize(value));                
+                _sb.Append(GqlObjectSerializer.Serialize(value, _builder));
             }
             
             return this;
