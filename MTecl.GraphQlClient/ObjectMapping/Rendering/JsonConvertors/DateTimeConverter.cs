@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors
 {
@@ -35,29 +36,48 @@ namespace MTecl.GraphQlClient.ObjectMapping.Rendering.JsonConvertors
         {
             private readonly string _format;
             private readonly CultureInfo _cultureInfo;
+            private readonly string[] _alternativeFormats;
 
-            public StringDateTimeConversion(string format, CultureInfo culture)
+            public StringDateTimeConversion(string format, CultureInfo culture, string[] alternativeFormats)
             {
                 _format = format;
                 _cultureInfo = culture ?? CultureInfo.InvariantCulture;
-
+                _alternativeFormats = alternativeFormats;
             }
 
             public DateTime Read(ref Utf8JsonReader reader, JsonSerializerOptions options)
             {
-                return DateTime.ParseExact(reader.GetString(), _format, _cultureInfo);
+                var dtString = reader.GetString();
+
+                foreach(var f in Formats)
+                    if (DateTime.TryParseExact(dtString, f, _cultureInfo, DateTimeStyles.None, out var parsed))
+                        return parsed;
+
+                throw new ArgumentException($"Cannot parse '{dtString}' as DateTime ");
             }
 
             public void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString(_format, _cultureInfo));
             }
+
+            private IEnumerable<string> Formats
+            {
+                get
+                {
+                    yield return _format;
+
+                    if (_alternativeFormats != null)
+                        foreach(var f in _alternativeFormats)
+                            yield return f;
+                }
+            }
         }
         #endregion
 
-        public static IDateTimeConversionMode StringConversionMode(string format, CultureInfo culture = null)
+        public static IDateTimeConversionMode StringConversionMode(string format, CultureInfo culture = null, string[] alternativeFormats = null)
         {
-            return new StringDateTimeConversion(format, culture);
+            return new StringDateTimeConversion(format, culture, alternativeFormats);
         }
     }
 }
