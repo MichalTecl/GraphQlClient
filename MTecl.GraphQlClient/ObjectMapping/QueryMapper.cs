@@ -150,7 +150,7 @@ namespace MTecl.GraphQlClient.ObjectMapping
 
         private static bool IsComplexType(Type t)
         {
-            return !ClrGqlTypeMap.TypeMap.ContainsKey(t);
+            return !ClrGqlTypeMap.TryGetGqlTypeName(t, out var _);
         }
     }
 }

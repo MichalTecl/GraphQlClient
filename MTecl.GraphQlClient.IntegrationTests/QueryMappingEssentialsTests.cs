@@ -157,6 +157,18 @@ namespace MTecl.GraphQlClient.IntegrationTests
             dimensionsNode.FindChild("weight").Should().NotBeNull();
             dimensionsNode.FindChild("height").Should().NotBeNull();
         }
+
+        [Fact]
+        public void NullablePrimitiveTypeConsideredPrimitiveType()
+        {
+            var query = QueryMapper.MapQuery<AnimalsQuery, IEnumerable<Animal>>(q => q.GetAnimals());
+
+            var methodNode = query.FindChild("animals");
+            methodNode.Should().NotBeNull();
+
+            var updateUserIdNode = methodNode.FindChild("update_user_id");
+            updateUserIdNode.Should().NotBeNull();
+        }
                 
         class AnimalsQuery
         {
@@ -195,6 +207,9 @@ namespace MTecl.GraphQlClient.IntegrationTests
 
             [Gql("dimensions_when_born")]
             public PhysicalDimensions DimensionsWhenBorn { get; set; }
+
+            [Gql("update_user_id")]
+            public int? UpdateUserId { get; set; }
         }
         class Territory
         {

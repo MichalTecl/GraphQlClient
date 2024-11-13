@@ -5,7 +5,7 @@ namespace MTecl.GraphQlClient.ObjectMapping
 {
     internal static class ClrGqlTypeMap
     {
-        public static readonly IDictionary<Type, string> TypeMap = new Dictionary<Type, string>
+        private static readonly IDictionary<Type, string> TypeMap = new Dictionary<Type, string>
         {
             { typeof(string), "String" },
             { typeof(int), "Int" },
@@ -23,5 +23,12 @@ namespace MTecl.GraphQlClient.ObjectMapping
             { typeof(ulong), "Int" },
             { typeof(DateTime), "String" }
         };
+
+        public static bool TryGetGqlTypeName(Type t, out string gqlTypeName)
+        {
+            t = Nullable.GetUnderlyingType(t) ?? t;
+
+            return TypeMap.TryGetValue(t, out gqlTypeName);
+        }
     }
 }
