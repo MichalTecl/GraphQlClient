@@ -83,7 +83,7 @@ namespace MTecl.GraphQlClient.ObjectMapping.Descriptors
             if (glt != null)
                 return glt.TypeName;
 
-            if (ClrGqlTypeMap.TypeMap.TryGetValue(type, out var gqlType))
+            if (ClrGqlTypeMap.TryGetGqlTypeName(type, out var gqlType))
                 return gqlType;
 
             return type.Name;
